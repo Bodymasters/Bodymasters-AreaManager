@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h3 class="mb-3">تفاصيل التشيك</h3>
+        <p class="text-muted">تاريخ التشيك: {{ check.check_date.strftime('%Y-%m-%d') }}</p>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('checks_list') }}" class="btn btn-secondary me-2">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل التشيكات
+        </a>
+        <a href="{{ url_for('edit_check', id=check.id) }}" class="btn btn-warning me-2">
+            <i class="fas fa-edit me-1"></i> تعديل
+        </a>
+        <a href="{{ url_for('delete_check', id=check.id) }}" class="btn btn-danger me-2">
+            <i class="fas fa-trash me-1"></i> حذف
+        </a>
+        <a href="{{ url_for('check_print', id=check.id) }}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-print me-1"></i> طباعة
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white py-2">
+                <i class="fas fa-info-circle me-1"></i> معلومات التشيك
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!-- معلومات التشيك -->
+                    <div class="col-md-2 text-center">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">رقم التشيك</h6>
+                            <h5 class="mb-0">{{ check.id }}</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">النادي</h6>
+                            <h5 class="mb-0">{{ check.club.name }}</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">تاريخ التشيك</h6>
+                            <h5 class="mb-0">{{ check.check_date.strftime('%Y-%m-%d') }}</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">المستخدم</h6>
+                            <h5 class="mb-0">{{ check.user.username }}</h5>
+                        </div>
+                    </div>
+                    <!-- نسبة المطابقة -->
+                    <div class="col-md-4">
+                        <h6 class="text-center text-muted mb-1">نسبة المطابقة</h6>
+                        <div class="progress mb-1" style="height: 25px; position: relative;">
+                            <div class="progress-bar {% if compliance_percentage < 50 %}bg-danger{% elif compliance_percentage < 80 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar"
+                                 style="width: {{ compliance_percentage }}%; min-width: 2em;"
+                                 aria-valuenow="{{ compliance_percentage }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">
+                                <span style="color: white; font-weight: bold; font-size: 18px; text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">{{ "%.1f"|format(compliance_percentage) }}%</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>مطابق: <strong class="text-success">{{ compliant_items }}</strong></span>
+                            <span>غير مطابق: <strong class="text-danger">{{ non_compliant_items }}</strong></span>
+                            <span>الإجمالي: <strong>{{ total_items }}</strong></span>
+                        </div>
+                    </div>
+                </div>
+                {% if check.notes %}
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-info mb-0">
+                            <strong>ملاحظات:</strong> {{ check.notes }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for facility, items in facilities_with_items.items() %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-building me-2"></i> {{ facility.name }}</h5>
+                <div class="d-flex align-items-center">
+                    {% set facility_items = items|length %}
+                    {% set facility_compliant_items = items|selectattr('is_compliant', 'eq', true)|list|length %}
+                    {% set facility_non_compliant_items = facility_items - facility_compliant_items %}
+                    {% set facility_compliance_percentage = (facility_compliant_items / facility_items * 100) if facility_items > 0 else 0 %}
+                    <div class="me-3">
+                        <span class="me-2">عدد البنود: <strong>{{ facility_items }}</strong></span>
+                        <span class="me-2">مطابق: <strong class="text-light">{{ facility_compliant_items }}</strong></span>
+                        <span>غير مطابق: <strong class="text-light">{{ facility_non_compliant_items }}</strong></span>
+                    </div>
+                    <div class="progress" style="width: 100px; height: 25px;">
+                        <div class="progress-bar {% if facility_compliance_percentage < 50 %}bg-danger{% elif facility_compliance_percentage < 80 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar"
+                             style="width: {{ facility_compliance_percentage }}%;"
+                             aria-valuenow="{{ facility_compliance_percentage }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            <span style="font-size: 16px; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5);">{{ "%.1f"|format(facility_compliance_percentage) }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50%">اسم البند</th>
+                                <th style="width: 15%" class="text-center">الحالة</th>
+                                <th style="width: 25%">ملاحظات</th>
+                                <th style="width: 10%" class="text-center">صورة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.facility_item.name }}</td>
+                                <td class="text-center">
+                                    {% if item.is_compliant %}
+                                    <span class="badge bg-success">مطابق</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">غير مطابق</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.notes or '-' }}</td>
+                                <td class="text-center">
+                                    {% if item.images %}
+                                    <a href="{{ url_for('uploaded_file', filename=item.images[0].image_path) }}" target="_blank" class="btn btn-sm btn-info">
+                                        <i class="fas fa-image"></i>
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+    @media print {
+        /* إخفاء العناصر التي لا نريد طباعتها */
+        .btn, .navbar, .row.mb-4, button, a.btn, .card-header {
+            display: none !important;
+        }
+
+        /* إخفاء المستخدم */
+        .col-md-2:nth-child(4) {
+            display: none !important;
+        }
+
+        /* تنسيق العناصر للطباعة */
+        body {
+            font-size: 10pt !important;
+            color: #000 !important;
+            background-color: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* تنسيق بطاقة معلومات التشيك للطباعة */
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* تغيير عرض بطاقة معلومات التشيك لتكون في صف واحد */
+        .row.align-items-center {
+            display: table !important;
+            width: 100% !important;
+            margin-top: 20px !important;
+            border: 1px solid #ddd !important;
+            padding: 10px !important;
+        }
+
+        .col-md-2 {
+            display: table-cell !important;
+            width: 33% !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .col-md-4 {
+            display: table-row !important;
+            width: 100% !important;
+            margin-top: 15px !important;
+        }
+
+        .border-end {
+            border: none !important;
+        }
+
+        /* تنسيق العناوين والقيم */
+        .text-muted {
+            font-size: 10pt !important;
+            margin: 0 !important;
+        }
+
+        h5.mb-0 {
+            font-size: 12pt !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+        }
+
+        /* تنسيق شريط التقدم */
+        .progress {
+            height: 25px !important;
+            margin: 10px auto !important;
+            width: 100% !important;
+            background-color: #f0f0f0 !important;
+        }
+
+        /* تنسيق الجداول */
+        table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+            margin-top: 20px !important;
+            margin-bottom: 0 !important;
+            font-size: 9pt !important;
+        }
+
+        th, td {
+            border: 1px solid #ddd !important;
+            padding: 4px !important;
+            text-align: center !important;
+        }
+
+        th {
+            background-color: #f0f0f0 !important;
+        }
+
+        /* إضافة عنوان للطباعة */
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+    }
+</style>
+
+<script>
+    // إضافة طريقة طباعة مخصصة
+    document.addEventListener('DOMContentLoaded', function() {
+        // إضافة مستمع لزر الطباعة
+        var printBtn = document.querySelector('button[onclick="window.print()"]');
+        if (printBtn) {
+            printBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.print();
+            });
+        }
+    });
+</script>
+{% endblock %}

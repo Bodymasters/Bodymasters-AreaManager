@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-1">مرافق {{ club.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('clubs') }}">النوادي</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('club_detail', id=club.id) }}">{{ club.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">المرافق</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ url_for('club_detail', id=club.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى تفاصيل النادي
+        </a>
+    </div>
+
+    <div class="row">
+        {% for facility in facilities %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 {% if facility.is_active %}border-success{% else %}border-danger{% endif %}">
+                <div class="card-header {% if facility.is_active %}bg-success{% else %}bg-danger{% endif %} text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ facility.name }}</h5>
+                    <span class="badge bg-light {% if facility.is_active %}text-success{% else %}text-danger{% endif %}">
+                        {% if facility.is_active %}
+                        <i class="fas fa-check-circle"></i> نشط
+                        {% else %}
+                        <i class="fas fa-times-circle"></i> معطل
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-swimming-pool fa-3x text-primary"></i>
+                    </div>
+                    <p class="card-text">
+                        يمكنك إدارة بنود هذا المرفق الخاصة بالنادي من هنا.
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('club_facility_items', club_id=club.id, facility_id=facility.id) }}" class="btn btn-primary w-100">
+                        <i class="fas fa-list me-1"></i> عرض البنود
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not facilities %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle fa-2x mb-3"></i>
+        <p>لا توجد مرافق مرتبطة بهذا النادي.</p>
+        <a href="{{ url_for('edit_club', id=club.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> إضافة مرافق للنادي
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

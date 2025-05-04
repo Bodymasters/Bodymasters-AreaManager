@@ -1,0 +1,242 @@
+/* تنسيق حقول التاريخ */
+.datepicker-input {
+    font-family: 'Segoe UI', Arial, sans-serif !important;
+    direction: ltr !important;
+    height: 45px;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    background-color: #fff;
+    position: relative;
+    cursor: pointer;
+}
+
+.datepicker-input:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* تنسيق منتقي التاريخ */
+.datepicker {
+    direction: rtl;
+    font-family: 'Cairo', sans-serif;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.datepicker table {
+    width: 100%;
+}
+
+.datepicker table tr td,
+.datepicker table tr th {
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    font-size: 14px;
+}
+
+.datepicker table tr th {
+    font-weight: 600;
+    color: #495057;
+}
+
+.datepicker table tr td.day:hover,
+.datepicker table tr td.focused {
+    background: #e6f0ff;
+    cursor: pointer;
+}
+
+.datepicker table tr td.active,
+.datepicker table tr td.active:hover,
+.datepicker table tr td.active.disabled,
+.datepicker table tr td.active.disabled:hover {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+    text-shadow: none;
+    box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
+}
+
+.datepicker table tr td.today {
+    background-color: #e6f0ff;
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.datepicker .datepicker-switch,
+.datepicker .prev,
+.datepicker .next {
+    font-size: 16px;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.datepicker .datepicker-switch:hover,
+.datepicker .prev:hover,
+.datepicker .next:hover {
+    background: #e6f0ff;
+    cursor: pointer;
+}
+
+.datepicker .datepicker-switch {
+    width: 145px;
+}
+
+.datepicker .dow {
+    font-weight: 600;
+    color: #495057;
+}
+
+.datepicker-dropdown:after {
+    border-bottom-color: #fff;
+}
+
+.datepicker-dropdown.datepicker-orient-top:after {
+    border-top-color: #fff;
+}
+
+/* تنسيق الأيقونة في حقل الإدخال */
+.date-input-container {
+    position: relative;
+}
+
+.date-input-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0d6efd;
+    pointer-events: none;
+}
+
+/* تنسيق الأرقام لتكون بالإنجليزية */
+.datepicker table tr td,
+.datepicker table tr th {
+    font-family: 'Segoe UI', Arial, sans-serif !important;
+}
+
+/* تنسيق أسماء الأشهر والسنوات */
+.datepicker-months .month,
+.datepicker-years .year,
+.datepicker-decades .decade,
+.datepicker-centuries .century {
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    display: inline-block;
+    margin: 5px;
+    border-radius: 50%;
+}
+
+.datepicker-months .month:hover,
+.datepicker-years .year:hover,
+.datepicker-decades .decade:hover,
+.datepicker-centuries .century:hover {
+    background: #e6f0ff;
+}
+
+.datepicker-months .month.active,
+.datepicker-years .year.active,
+.datepicker-decades .decade.active,
+.datepicker-centuries .century.active {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* تنسيق عنوان الشهر والسنة */
+.datepicker .datepicker-switch {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* تنسيق أزرار التنقل */
+.datepicker .prev,
+.datepicker .next {
+    font-size: 20px;
+    line-height: 1;
+    padding: 10px;
+}
+
+/* تنسيق أيام الأسبوع */
+.datepicker .dow {
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+/* تنسيق اليوم المعطل */
+.datepicker table tr td.disabled,
+.datepicker table tr td.disabled:hover {
+    color: #dee2e6;
+    cursor: default;
+    background: none;
+}
+
+/* تنسيق اليوم الحالي */
+.datepicker table tr td.today {
+    position: relative;
+}
+
+.datepicker table tr td.today:before {
+    content: '';
+    display: inline-block;
+    border: solid transparent;
+    border-width: 0 0 7px 7px;
+    border-bottom-color: #0d6efd;
+    border-top-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+}
+
+/* تنسيق اليوم المحدد */
+.datepicker table tr td.active {
+    position: relative;
+}
+
+/* تنسيق الأيام خارج الشهر الحالي */
+.datepicker table tr td.old,
+.datepicker table tr td.new {
+    color: #adb5bd;
+}
+
+/* تنسيق الشهر المحدد */
+.datepicker-months .table-condensed tbody td span.month.active,
+.datepicker-months .table-condensed tbody td span.month:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* تنسيق السنة المحددة */
+.datepicker-years .table-condensed tbody td span.year.active,
+.datepicker-years .table-condensed tbody td span.year:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* تنسيق العقد المحدد */
+.datepicker-decades .table-condensed tbody td span.decade.active,
+.datepicker-decades .table-condensed tbody td span.decade:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* تنسيق القرن المحدد */
+.datepicker-centuries .table-condensed tbody td span.century.active,
+.datepicker-centuries .table-condensed tbody td span.century:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}

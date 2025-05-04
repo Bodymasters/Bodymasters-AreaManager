@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-sun me-2"></i> تفاصيل سجل شموس</h2>
+        <div>
+            <a href="{{ url_for('shumoos_list') }}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل شموس
+            </a>
+            <a href="{{ url_for('edit_shumoos', id=shumoos_record.id) }}" class="btn btn-warning me-2">
+                <i class="fas fa-edit me-1"></i> تعديل
+            </a>
+            <form method="post" action="{{ url_for('delete_shumoos', id=shumoos_record.id) }}" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i> حذف
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- بطاقة تفاصيل السجل -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-info-circle me-2"></i> معلومات السجل</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">معلومات النادي</h5>
+                            <hr>
+                            <p class="mb-2"><strong>اسم النادي:</strong> {{ shumoos_record.club.name }}</p>
+                            <p class="mb-2"><strong>الموقع:</strong> {{ shumoos_record.club.location }}</p>
+                            <p class="mb-2"><strong>مدير النادي:</strong> {{ shumoos_record.club.manager_name }}</p>
+                            <p class="mb-0"><strong>رقم الهاتف:</strong> {{ shumoos_record.club.phone }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">معلومات التسجيل</h5>
+                            <hr>
+                            <p class="mb-2"><strong>العدد المسجل:</strong> <span class="english-number" style="font-weight: bold; font-size: 18px;">{{ shumoos_record.registered_count }}</span></p>
+                            <p class="mb-2"><strong>تاريخ التسجيل:</strong> <span class="english-number">{{ shumoos_record.registration_date.strftime('%Y-%m-%d') }}</span></p>
+                            <p class="mb-2">
+                                <strong>الفارق عن السجل السابق:</strong> 
+                                <span class="english-number" style="font-weight: bold; font-size: 18px;
+                                    {% if shumoos_record.get_difference() > 0 %}
+                                        color: green;
+                                    {% elif shumoos_record.get_difference() < 0 %}
+                                        color: red;
+                                    {% endif %}
+                                ">
+                                    {% if shumoos_record.get_difference() > 0 %}
+                                        +{{ shumoos_record.get_difference() }}
+                                    {% else %}
+                                        {{ shumoos_record.get_difference() }}
+                                    {% endif %}
+                                </span>
+                            </p>
+                            <p class="mb-0"><strong>تاريخ الإضافة:</strong> <span class="english-number">{{ shumoos_record.created_at.strftime('%Y-%m-%d %H:%M') }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

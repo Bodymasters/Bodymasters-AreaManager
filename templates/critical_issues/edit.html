@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">تعديل العطل الحرج</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('critical_issues_list') }}">الأعطال الحرجة</a></li>
+                <li class="breadcrumb-item active" aria-current="page">تعديل العطل</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ url_for('critical_issue_detail', id=issue.id) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-right me-1"></i> العودة إلى التفاصيل
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i> تعديل بيانات العطل الحرج</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('edit_critical_issue', id=issue.id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="club_id" class="form-label">النادي <span class="text-danger">*</span></label>
+                            <select class="form-select" id="club_id" name="club_id" required>
+                                <option value="" disabled>اختر النادي</option>
+                                {% for club in clubs %}
+                                <option value="{{ club.id }}" {% if club.id == issue.club_id %}selected{% endif %}>{{ club.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="facility_id" class="form-label">المرفق <span class="text-danger">*</span></label>
+                            <select class="form-select" id="facility_id" name="facility_id" required>
+                                <option value="" disabled>اختر المرفق</option>
+                                {% for facility in facilities %}
+                                <option value="{{ facility.id }}" {% if facility.id == issue.facility_id %}selected{% endif %}>{{ facility.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="ticket_number" class="form-label">رقم الطلب <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ticket_number" name="ticket_number" value="{{ issue.ticket_number }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">الحالة <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="" disabled>اختر الحالة</option>
+                                {% for status in status_options %}
+                                <option value="{{ status }}" {% if status == issue.status %}selected{% endif %}>{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="creation_date" class="form-label">تاريخ إنشاء الطلب <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control english-number" id="creation_date" name="creation_date" value="{{ creation_date }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="due_date" class="form-label">تاريخ الاستحقاق <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control english-number" id="due_date" name="due_date" value="{{ due_date }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">ملاحظات</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="4">{{ issue.notes }}</textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-save me-1"></i> حفظ التعديلات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block head %}
+<!-- إضافة تنسيق حقول التاريخ البسيطة -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/simple-date.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<!-- إضافة سكريبت حقول التاريخ البسيطة -->
+<script src="{{ url_for('static', filename='js/simple-date.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // تعيين لغة حقول التاريخ للإنجليزية
+        const creationDateInput = document.getElementById('creation_date');
+        const dueDateInput = document.getElementById('due_date');
+
+        // تعيين اللغة والسمات الإضافية
+        creationDateInput.lang = 'en';
+        dueDateInput.lang = 'en';
+
+        // إضافة سمات إضافية للتأكد من عرض التاريخ باللغة الإنجليزية
+        creationDateInput.setAttribute('data-date', '');
+        dueDateInput.setAttribute('data-date', '');
+
+        // إضافة مستمع الحدث للنقر لفتح منتقي التاريخ
+        creationDateInput.addEventListener('click', function() {
+            this.showPicker();
+        });
+
+        dueDateInput.addEventListener('click', function() {
+            this.showPicker();
+        });
+
+        // تحديث قائمة المرافق عند تغيير النادي
+        const clubSelect = document.getElementById('club_id');
+        const facilitySelect = document.getElementById('facility_id');
+        const currentFacilityId = {{ issue.facility_id }};
+
+        // وظيفة لتحديث قائمة المرافق
+        function updateFacilities(clubId) {
+            if (clubId) {
+                // تفريغ قائمة المرافق وإضافة خيار التحميل
+                facilitySelect.innerHTML = '<option value="" selected disabled>جاري تحميل المرافق...</option>';
+                facilitySelect.disabled = true;
+
+                // طلب المرافق من الخادم
+                fetch(`/api/clubs/${clubId}/facilities`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // تفريغ القائمة وإضافة خيار الاختيار
+                        facilitySelect.innerHTML = '<option value="" disabled>اختر المرفق</option>';
+
+                        // إضافة المرافق إلى القائمة
+                        if (Array.isArray(data) && data.length > 0) {
+                            data.forEach(facility => {
+                                const option = document.createElement('option');
+                                option.value = facility.id;
+                                option.textContent = facility.name;
+                                if (facility.id == currentFacilityId) {
+                                    option.selected = true;
+                                }
+                                facilitySelect.appendChild(option);
+                            });
+                        } else {
+                            // إذا لم تكن هناك مرافق
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.disabled = true;
+                            option.textContent = 'لا توجد مرافق لهذا النادي';
+                            facilitySelect.appendChild(option);
+                        }
+
+                        facilitySelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching facilities:', error);
+                        facilitySelect.innerHTML = '<option value="" selected disabled>حدث خطأ في تحميل المرافق</option>';
+                        facilitySelect.disabled = false;
+                    });
+            } else {
+                // إذا لم يتم اختيار نادي
+                facilitySelect.innerHTML = '<option value="" selected disabled>اختر النادي أولاً</option>';
+                facilitySelect.disabled = true;
+            }
+        }
+
+        // إضافة مستمع الحدث لتغيير النادي
+        clubSelect.addEventListener('change', function() {
+            updateFacilities(this.value);
+        });
+
+        // تشغيل الحدث إذا كان هناك نادي محدد بالفعل
+        // تأخير بسيط للتأكد من تحميل الصفحة بالكامل
+        setTimeout(function() {
+            if (clubSelect.value) {
+                updateFacilities(clubSelect.value);
+            }
+        }, 100);
+    });
+</script>
+{% endblock %}

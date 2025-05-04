@@ -1,0 +1,520 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>إضافة جدول دوام جديد</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('clubs') }}">النوادي</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('club_detail', id=club.id) }}">{{ club.name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('club_schedules', club_id=club.id) }}">جداول الدوام</a></li>
+                <li class="breadcrumb-item active" aria-current="page">إضافة جدول دوام</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{{ url_for('club_schedules', club_id=club.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة للجداول
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">إضافة جدول دوام جديد</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('new_schedule', club_id=club.id) }}">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-user-circle me-2"></i> بيانات الموظف</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">اسم الموظف <span class="text-danger">*</span></label>
+                                        {% if request.args.get('employee_id') %}
+                                            {% for employee in available_employees %}
+                                                {% if employee.id == request.args.get('employee_id')|int %}
+                                                    <input type="text" class="form-control" value="{{ employee.name }}" readonly>
+                                                    <input type="hidden" id="employee_id" name="employee_id" value="{{ employee.id }}">
+                                                    <small class="text-muted">{{ employee.position }}</small>
+                                                    <script>
+                                                        // تحديث رقم الهاتف عند تحميل الصفحة
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const mobileNumberDisplay = document.getElementById('mobile_number_display');
+                                                            const mobileNumberHidden = document.getElementById('mobile_number');
+                                                            mobileNumberDisplay.value = "{{ employee.phone or '' }}";
+                                                            mobileNumberHidden.value = "{{ employee.phone or '' }}";
+                                                        });
+                                                    </script>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                يرجى العودة واختيار موظف من صفحة الموظفين أولاً
+                                            </div>
+                                            <a href="{{ url_for('club_schedules', club_id=club.id) }}" class="btn btn-primary">
+                                                <i class="fas fa-arrow-right me-1"></i> العودة لقائمة الموظفين
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-0">
+                                        <label for="mobile_number_display" class="form-label">رقم الجوال</label>
+                                        <input type="text" class="form-control text-center" id="mobile_number_display" dir="ltr" readonly>
+                                        <input type="hidden" id="mobile_number" name="mobile_number">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h5 class="border-bottom pb-2 mb-3">معلومات الدوام</h5>
+                </div>
+
+                <!-- نوع الدوام وساعات العمل -->
+                <div class="col-md-12 mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">نوع الدوام</label>
+                                <div class="d-flex">
+                                    <div class="form-check form-check-inline me-4">
+                                        <input class="form-check-input" type="radio" name="shift_type" id="shift_type_one" value="one_shift" checked>
+                                        <label class="form-check-label" for="shift_type_one">فترة واحدة</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="shift_type" id="shift_type_two" value="two_shifts">
+                                        <label class="form-check-label" for="shift_type_two">فترتين</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">ساعات العمل</label>
+                                <div class="d-flex">
+                                    <div class="form-check form-check-inline me-4">
+                                        <input class="form-check-input" type="radio" name="work_hours" id="work_hours_7" value="7">
+                                        <label class="form-check-label" for="work_hours_7">7 ساعات</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="work_hours" id="work_hours_8" value="8" checked>
+                                        <label class="form-check-label" for="work_hours_8">8 ساعات</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الدوام الأول -->
+                <div class="col-md-6" id="shift1_container">
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">الدوام الأول</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="shift1_start" class="form-label">من</label>
+                                        <input type="time" class="form-control text-center fs-5" id="shift1_start" name="shift1_start">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="shift1_end" class="form-label">إلى</label>
+                                        <input type="time" class="form-control text-center fs-5" id="shift1_end" name="shift1_end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الدوام الثاني -->
+                <div class="col-md-6" id="shift2_container" style="display: none;">
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">الدوام الثاني</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="shift2_start" class="form-label">من</label>
+                                        <input type="time" class="form-control text-center fs-5" id="shift2_start" name="shift2_start">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="shift2_end" class="form-label">إلى</label>
+                                        <input type="time" class="form-control text-center fs-5" id="shift2_end" name="shift2_end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // إظهار/إخفاء الدوام الثاني بناءً على نوع الدوام
+                document.addEventListener('DOMContentLoaded', function() {
+                    const shiftTypeOne = document.getElementById('shift_type_one');
+                    const shiftTypeTwo = document.getElementById('shift_type_two');
+                    const shift2Container = document.getElementById('shift2_container');
+                    const shift1Start = document.getElementById('shift1_start');
+                    const shift1End = document.getElementById('shift1_end');
+                    const shift2Start = document.getElementById('shift2_start');
+                    const shift2End = document.getElementById('shift2_end');
+                    const workHours7 = document.getElementById('work_hours_7');
+                    const workHours8 = document.getElementById('work_hours_8');
+
+                    // تغيير عرض الدوام الثاني بناءً على نوع الدوام
+                    function toggleShift2() {
+                        if (shiftTypeTwo.checked) {
+                            shift2Container.style.display = 'block';
+
+                            // عند اختيار فترتين، نقوم بتقسيم ساعات العمل بين الفترتين
+                            // وإعادة حساب أوقات الانتهاء إذا كانت أوقات البدء محددة
+                            if (shift1Start.value) {
+                                suggestEndTime(shift1Start, shift1End, 4);
+                            }
+                            if (shift2Start.value) {
+                                suggestEndTime(shift2Start, shift2End, 4);
+                            }
+                        } else {
+                            shift2Container.style.display = 'none';
+
+                            // عند اختيار فترة واحدة، نعود إلى 8 ساعات للفترة الواحدة
+                            if (shift1Start.value) {
+                                suggestEndTime(shift1Start, shift1End, 8);
+                            }
+                        }
+                    }
+
+                    // تفعيل التغيير عند تغيير نوع الدوام
+                    shiftTypeOne.addEventListener('change', toggleShift2);
+                    shiftTypeTwo.addEventListener('change', toggleShift2);
+
+                    // دالة لاقتراح وقت الانتهاء بناءً على وقت البدء وعدد الساعات
+                    function suggestEndTime(startInput, endInput, hours) {
+                        if (!startInput.value) return;
+
+                        const startTime = new Date(`2000-01-01T${startInput.value}:00`);
+                        const endTime = new Date(startTime.getTime() + hours * 60 * 60 * 1000);
+
+                        // تنسيق الوقت بصيغة HH:MM
+                        const endHours = endTime.getHours().toString().padStart(2, '0');
+                        const endMinutes = endTime.getMinutes().toString().padStart(2, '0');
+                        endInput.value = `${endHours}:${endMinutes}`;
+                    }
+
+                    // تفعيل اقتراح وقت الانتهاء عند تغيير وقت البداية
+                    shift1Start.addEventListener('change', function() {
+                        const hours = shiftTypeTwo.checked ? 4 : 8;
+                        suggestEndTime(shift1Start, shift1End, hours);
+                    });
+
+                    shift2Start.addEventListener('change', function() {
+                        suggestEndTime(shift2Start, shift2End, 4); // الفترة الثانية دائمًا 4 ساعات
+                    });
+
+                    // تفعيل إعادة حساب أوقات الانتهاء عند تغيير ساعات العمل
+                    workHours7.addEventListener('change', function() {
+                        // لا نحتاج لتغيير شيء هنا لأننا نعتمد على نوع الدوام (فترة واحدة أو فترتين)
+                    });
+
+                    workHours8.addEventListener('change', function() {
+                        // لا نحتاج لتغيير شيء هنا لأننا نعتمد على نوع الدوام (فترة واحدة أو فترتين)
+                    });
+
+                    // تنفيذ الدالة عند تحميل الصفحة للتأكد من الحالة الصحيحة
+                    toggleShift2();
+                });
+            </script>
+
+
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h5 class="border-bottom pb-2 mb-3">أيام الدوام والإجازات</h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block">أيام الدوام</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_sun" name="work_days" value="الأحد">
+                            <label class="form-check-label" for="work_day_sun">الأحد</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_mon" name="work_days" value="الاثنين">
+                            <label class="form-check-label" for="work_day_mon">الاثنين</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_tue" name="work_days" value="الثلاثاء">
+                            <label class="form-check-label" for="work_day_tue">الثلاثاء</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_wed" name="work_days" value="الأربعاء">
+                            <label class="form-check-label" for="work_day_wed">الأربعاء</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_thu" name="work_days" value="الخميس">
+                            <label class="form-check-label" for="work_day_thu">الخميس</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_fri" name="work_days" value="الجمعة">
+                            <label class="form-check-label" for="work_day_fri">الجمعة</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="work_day_sat" name="work_days" value="السبت">
+                            <label class="form-check-label" for="work_day_sat">السبت</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block">أيام الإجازة</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_sun" name="off_days" value="الأحد">
+                            <label class="form-check-label" for="off_day_sun">الأحد</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_mon" name="off_days" value="الاثنين">
+                            <label class="form-check-label" for="off_day_mon">الاثنين</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_tue" name="off_days" value="الثلاثاء">
+                            <label class="form-check-label" for="off_day_tue">الثلاثاء</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_wed" name="off_days" value="الأربعاء">
+                            <label class="form-check-label" for="off_day_wed">الأربعاء</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_thu" name="off_days" value="الخميس">
+                            <label class="form-check-label" for="off_day_thu">الخميس</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_fri" name="off_days" value="الجمعة">
+                            <label class="form-check-label" for="off_day_fri">الجمعة</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="off_day_sat" name="off_days" value="السبت">
+                            <label class="form-check-label" for="off_day_sat">السبت</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h5 class="border-bottom pb-2 mb-3">معلومات التخصيص</h5>
+                </div>
+
+                <!-- اختيار عدد أيام التخصيص -->
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        <label class="form-label">عدد أيام التخصيص</label>
+                        <div class="d-flex">
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="radio" name="allocation_days_count" id="allocation_days_count_1" value="1" checked onclick="document.getElementById('second_day_section').style.display='none';">
+                                <label class="form-check-label" for="allocation_days_count_1">يوم واحد</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="allocation_days_count" id="allocation_days_count_2" value="2" onclick="document.getElementById('second_day_section').style.display='block';">
+                                <label class="form-check-label" for="allocation_days_count_2">يومين</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- اليوم الأول -->
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">اليوم الأول</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="allocation_from" class="form-label">من</label>
+                                            <input type="time" class="form-control text-center" id="allocation_from" name="allocation_from" oninput="calculateEndTime('allocation_from', 'allocation_to')">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="allocation_to" class="form-label">إلى</label>
+                                            <input type="time" class="form-control text-center" id="allocation_to" name="allocation_to">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label d-block">أيام التخصيص</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_sun" name="allocation_days" value="الأحد">
+                                                <label class="form-check-label" for="allocation_day_sun">الأحد</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_mon" name="allocation_days" value="الاثنين">
+                                                <label class="form-check-label" for="allocation_day_mon">الاثنين</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_tue" name="allocation_days" value="الثلاثاء">
+                                                <label class="form-check-label" for="allocation_day_tue">الثلاثاء</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_wed" name="allocation_days" value="الأربعاء">
+                                                <label class="form-check-label" for="allocation_day_wed">الأربعاء</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_thu" name="allocation_days" value="الخميس">
+                                                <label class="form-check-label" for="allocation_day_thu">الخميس</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_fri" name="allocation_days" value="الجمعة">
+                                                <label class="form-check-label" for="allocation_day_fri">الجمعة</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_sat" name="allocation_days" value="السبت">
+                                                <label class="form-check-label" for="allocation_day_sat">السبت</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- اليوم الثاني -->
+                    <div class="col-md-6" id="second_day_section" style="display: none;">
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">اليوم الثاني</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="allocation_from_2" class="form-label">من</label>
+                                            <input type="time" class="form-control text-center" id="allocation_from_2" name="allocation_from_2" oninput="calculateEndTime('allocation_from_2', 'allocation_to_2')">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="allocation_to_2" class="form-label">إلى</label>
+                                            <input type="time" class="form-control text-center" id="allocation_to_2" name="allocation_to_2">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label d-block">أيام التخصيص</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_sun_2" name="allocation_days_2" value="الأحد">
+                                                <label class="form-check-label" for="allocation_day_sun_2">الأحد</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_mon_2" name="allocation_days_2" value="الاثنين">
+                                                <label class="form-check-label" for="allocation_day_mon_2">الاثنين</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_tue_2" name="allocation_days_2" value="الثلاثاء">
+                                                <label class="form-check-label" for="allocation_day_tue_2">الثلاثاء</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_wed_2" name="allocation_days_2" value="الأربعاء">
+                                                <label class="form-check-label" for="allocation_day_wed_2">الأربعاء</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_thu_2" name="allocation_days_2" value="الخميس">
+                                                <label class="form-check-label" for="allocation_day_thu_2">الخميس</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_fri_2" name="allocation_days_2" value="الجمعة">
+                                                <label class="form-check-label" for="allocation_day_fri_2">الجمعة</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="allocation_day_sat_2" name="allocation_days_2" value="السبت">
+                                                <label class="form-check-label" for="allocation_day_sat_2">السبت</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary px-5">
+                    <i class="fas fa-save me-1"></i> حفظ
+                </button>
+                <a href="{{ url_for('club_schedules', club_id=club.id) }}" class="btn btn-secondary px-5">
+                    <i class="fas fa-times me-1"></i> إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // دالة لحساب وقت الانتهاء تلقائيًا (4 أو 8 ساعات بعد وقت البدء حسب عدد أيام التخصيص)
+    function calculateEndTime(startFieldId, endFieldId) {
+        var startField = document.getElementById(startFieldId);
+        var endField = document.getElementById(endFieldId);
+
+        if (startField.value) {
+            // تحويل وقت البدء إلى كائن Date
+            var startTime = new Date('2000-01-01T' + startField.value + ':00');
+
+            // التحقق من عدد أيام التخصيص
+            var daysCount = document.querySelector('input[name="allocation_days_count"]:checked').value;
+
+            // إضافة 4 ساعات إذا كان يومين، وإلا 8 ساعات
+            var hoursToAdd = (daysCount === '2') ? 4 : 8;
+            startTime.setHours(startTime.getHours() + hoursToAdd);
+
+            // تنسيق وقت الانتهاء
+            var hours = startTime.getHours().toString().padStart(2, '0');
+            var minutes = startTime.getMinutes().toString().padStart(2, '0');
+
+            // تعيين وقت الانتهاء
+            endField.value = hours + ':' + minutes;
+        }
+    }
+
+    // إضافة مستمعي أحداث لحقول وقت البدء
+    document.addEventListener('DOMContentLoaded', function() {
+        // إضافة مستمعي أحداث لحقول وقت البدء
+        document.getElementById('allocation_from').addEventListener('input', function() {
+            calculateEndTime('allocation_from', 'allocation_to');
+        });
+
+        document.getElementById('allocation_from_2').addEventListener('input', function() {
+            calculateEndTime('allocation_from_2', 'allocation_to_2');
+        });
+    });
+</script>
+{% endblock %}

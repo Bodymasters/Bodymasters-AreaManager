@@ -1,0 +1,64 @@
+/* تثبيت شريط التنقل */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding-top: 40px; /* ارتفاع شريط التنقل فقط */
+}
+
+.navbar.fixed-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1030;
+    margin: 0;
+    padding: 0;
+    height: 40px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* إزالة أي هوامش إضافية */
+.navbar-nav {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-brand {
+    margin: 0;
+    padding: 0 15px;
+}
+
+/* تعديل المحتوى الرئيسي */
+main.container-fluid, .container-fluid {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* إزالة أي هوامش علوية في العناصر الأولى */
+.row:first-child {
+    margin-top: 0;
+}
+
+/* تأكيد عدم وجود هوامش في الأعلى */
+.navbar-nav .nav-link {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 14px;
+}
+
+/* تعديل حجم الخط في شريط التنقل */
+.navbar-brand {
+    font-size: 16px;
+    padding: 8px 15px;
+}
+
+/* تعديل زر التوجل في الشاشات الصغيرة */
+.navbar-toggler {
+    padding: 2px 5px;
+    font-size: 14px;
+    margin: 4px;
+}

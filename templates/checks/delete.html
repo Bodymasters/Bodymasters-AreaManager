@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-3">حذف التشيك</h1>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('check_detail', id=check.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى تفاصيل التشيك
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white py-2">
+                <i class="fas fa-exclamation-triangle me-1"></i> تأكيد الحذف
+            </div>
+            <div class="card-body">
+                <p class="mb-4">هل أنت متأكد من حذف التشيك رقم {{ check.id }} لنادي {{ check.club.name }}؟</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>تحذير:</strong> سيتم حذف جميع بيانات التشيك بما في ذلك البنود والصور المرفقة. هذا الإجراء لا يمكن التراجع عنه.
+                </div>
+
+                <form action="{{ url_for('delete_check', id=check.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> نعم، حذف التشيك
+                    </button>
+                    <a href="{{ url_for('check_detail', id=check.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> إلغاء
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

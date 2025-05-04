@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-1">بنود {{ facility.name }} في {{ club.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('clubs') }}">النوادي</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('club_detail', id=club.id) }}">{{ club.name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('club_facilities', club_id=club.id) }}">المرافق</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">بنود {{ facility.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ url_for('club_facilities', club_id=club.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى المرافق
+        </a>
+    </div>
+
+    <div class="alert alert-info mb-4">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="fas fa-info-circle fa-2x"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading">ملاحظة هامة</h5>
+                <p class="mb-0">البنود المعروضة هنا خاصة بهذا النادي فقط. تفعيل أو تعطيل أي بند لن يؤثر على نفس البند في الأندية الأخرى.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i> بنود المرفق الحالية</h5>
+                    <span class="badge bg-light text-primary">{{ club_facility_items|length }} بند</span>
+                </div>
+                <div class="card-body">
+                    {% if club_facility_items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>اسم البند</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in club_facility_items %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ item.facility_item.name }}</td>
+                                    <td>
+                                        {% if item.is_active %}
+                                        <span class="badge bg-success">نشط</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">معطل</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <form action="{{ url_for('toggle_club_facility_item', club_id=club.id, facility_id=facility.id, item_id=item.facility_item_id) }}" method="post">
+                                                <button type="submit" class="btn btn-sm {% if item.is_active %}btn-warning{% else %}btn-success{% endif %}" title="{% if item.is_active %}تعطيل{% else %}تفعيل{% endif %}">
+                                                    <i class="fas {% if item.is_active %}fa-times-circle{% else %}fa-check-circle{% endif %}"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{{ url_for('remove_club_facility_item', club_id=club.id, facility_id=facility.id, item_id=item.facility_item_id) }}" method="post" class="ms-1">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="إزالة" onclick="return confirm('هل أنت متأكد من إزالة هذا البند؟')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="text-muted mb-3">
+                            <i class="fas fa-box-open fa-3x"></i>
+                        </div>
+                        <p>لا توجد بنود مضافة لهذا المرفق في النادي.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i> إضافة بنود جديدة</h5>
+                </div>
+                <div class="card-body">
+                    {% if available_items %}
+                    <form action="{{ url_for('add_club_facility_item', club_id=club.id, facility_id=facility.id) }}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">اختر البنود المراد إضافتها:</label>
+                            <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                {% for item in available_items %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="items" value="{{ item.id }}" id="item{{ item.id }}">
+                                    <label class="form-check-label" for="item{{ item.id }}">
+                                        {{ item.name }}
+                                        {% if not item.is_active %}
+                                        <span class="badge bg-danger ms-1">معطل</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-plus-circle me-1"></i> إضافة البنود المحددة
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="text-muted mb-3">
+                            <i class="fas fa-check-circle fa-3x"></i>
+                        </div>
+                        <p>تم إضافة جميع البنود المتاحة لهذا المرفق.</p>
+                        <a href="{{ url_for('facility_items', facility_id=facility.id) }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i> إضافة بنود جديدة للمرفق
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

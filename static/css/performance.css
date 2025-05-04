@@ -1,0 +1,180 @@
+/**
+ * تحسينات الأداء للتطبيق
+ * تقليل وقت التحميل وتحسين تجربة المستخدم
+ */
+
+/* تحسين تحميل الصفحة */
+body {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+body.loading {
+    opacity: 0.7;
+}
+
+/* مؤشر التحميل */
+#page-loading-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    z-index: 9999;
+    background-color: transparent;
+}
+
+#page-loading-indicator .spinner {
+    height: 100%;
+    width: 0;
+    background-color: #2563eb;
+    transition: width 0.3s ease-in-out;
+}
+
+/* تحسين أداء التمرير */
+* {
+    scroll-behavior: smooth;
+}
+
+/* تحسين أداء التحولات */
+.card, .btn, .nav-link, .dropdown-item {
+    transition: all 0.2s ease-out !important;
+}
+
+/* تحسين عرض الصور أثناء التحميل */
+img[data-src] {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+img {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* تحسين أداء الجداول الكبيرة */
+.table-responsive {
+    contain: content;
+}
+
+/* تحسين أداء القوائم المنسدلة */
+.dropdown-menu {
+    contain: content;
+}
+
+/* تحسين أداء النماذج */
+form {
+    contain: content;
+}
+
+/* تحسين أداء البطاقات */
+.card {
+    contain: content;
+}
+
+/* تحسين أداء الرسوم البيانية */
+.chart-container {
+    contain: content;
+}
+
+/* تحسين أداء الأزرار */
+.btn {
+    contain: content;
+}
+
+/* تحسين أداء شريط التنقل */
+.navbar {
+    contain: layout style;
+}
+
+/* تحسين أداء تذييل الصفحة */
+footer {
+    contain: layout style;
+}
+
+/* تحسين أداء الصفحة الرئيسية */
+.dashboard-card {
+    contain: content;
+}
+
+/* تحسين أداء الصور */
+img {
+    content-visibility: auto;
+}
+
+/* تحسين أداء العناصر غير المرئية */
+.offscreen {
+    content-visibility: hidden;
+}
+
+/* تحسين أداء التقويم */
+.calendar-container {
+    contain: content;
+}
+
+/* تحسين أداء الرسائل */
+.alert {
+    contain: content;
+}
+
+/* تحسين أداء الأيقونات */
+.fas, .far, .fab, .fa {
+    font-display: swap;
+}
+
+/* تحسين أداء الخطوط */
+@font-face {
+    font-family: 'Cairo';
+    font-display: swap;
+}
+
+/* تحسين أداء الصور الخلفية */
+[style*="background-image"] {
+    will-change: transform;
+}
+
+/* تحسين أداء التحولات */
+.transition {
+    will-change: transform, opacity;
+}
+
+/* تحسين أداء الرسوم المتحركة */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* مؤشر تحميل للأزرار */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1em;
+    height: 1em;
+    margin-top: -0.5em;
+    margin-left: -0.5em;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* تحسين أداء الصفحات الطويلة */
+main {
+    content-visibility: auto;
+    contain-intrinsic-size: 1000px;
+}

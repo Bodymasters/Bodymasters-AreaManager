@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-edit me-2"></i> تعديل المبيعات اليومية</h2>
+        <a href="{{ url_for('sales_target_detail', id=daily_sale.target_id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى التفاصيل
+        </a>
+    </div>
+
+    <!-- نموذج تعديل المبيعات -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-edit me-2"></i> تعديل مبيعات {{ daily_sale.sale_date.strftime('%Y-%m-%d') }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('edit_daily_sales', id=daily_sale.id) }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">النادي</label>
+                            <input type="text" class="form-control" value="{{ daily_sale.target.club.name }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">التاريخ</label>
+                            <input type="date" class="form-control" id="sale_date" name="sale_date" value="{{ daily_sale.sale_date.strftime('%Y-%m-%d') }}" style="height: 45px; font-size: 18px; text-align: center; direction: ltr;" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">مبلغ المبيعات <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control english-number numeric-input" id="amount" name="amount" value="{{ daily_sale.amount }}" required>
+                                <span class="input-group-text">ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-1"></i> حفظ التعديلات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* تنسيق حقل التاريخ */
+    #sale_date {
+        font-family: Arial, sans-serif !important;
+        direction: ltr !important;
+    }
+
+    /* إزالة أسهم حقل الرقم لجميع المتصفحات */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="text"].numeric-input::-webkit-inner-spin-button,
+    input[type="text"].numeric-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"],
+    input[type="text"].numeric-input {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إضافة معالجة لحقل المبلغ للتأكد من أنه دائمًا باللغة الإنجليزية
+        document.getElementById('amount').addEventListener('input', function() {
+            // التأكد من أن القيمة هي أرقام فقط
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+
+        // تعيين لغة حقل التاريخ للإنجليزية
+        document.getElementById('sale_date').lang = 'en';
+    });
+</script>
+{% endblock %}

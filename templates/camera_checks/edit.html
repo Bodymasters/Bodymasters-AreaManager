@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-3">تعديل متابعة الكاميرات</h1>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('camera_checks_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> العودة للقائمة
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <i class="fas fa-edit me-1"></i> تعديل متابعة الكاميرات
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('edit_camera_check', id=camera_check.id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="club_id" class="form-label">النادي</label>
+                            <select class="form-select" id="club_id" name="club_id" disabled>
+                                <option value="{{ camera_check.club.id }}" selected>{{ camera_check.club.name }}</option>
+                            </select>
+                            <input type="hidden" name="club_id" value="{{ camera_check.club.id }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="check_date" class="form-label">تاريخ المتابعة</label>
+                            <input type="date" class="form-control text-center" id="check_date" name="check_date" value="{{ camera_check.check_date.strftime('%Y-%m-%d') }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="violations_count" class="form-label">عدد المخالفات</label>
+                            <input type="text" class="form-control" id="violations_count" name="violations_count" value="{{ camera_check.violations_count or '' }}" style="-webkit-appearance: none; -moz-appearance: textfield;">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="notes" class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ camera_check.notes }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">افتتاح النادي</th>
+                                    {% for time_slot in time_slots %}
+                                    <th class="text-center">{{ time_slot.time_slot }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center align-middle">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" id="club_opening" name="club_opening" {% if club_opening %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                    {% for time_slot in time_slots %}
+                                    <td class="text-center align-middle">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" id="time_slot_{{ time_slot.time_slot }}" name="time_slot_{{ time_slot.time_slot }}" {% if time_slot.is_working %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12 text-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> حفظ التعديلات
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

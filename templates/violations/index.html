@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">سجل المخالفات</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item active" aria-current="page">سجل المخالفات</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        {% if current_user.has_permission('add_violation') %}
+        <a href="{{ url_for('new_violation') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> تسجيل مخالفة جديدة
+        </a>
+
+        {% endif %}
+        {% if current_user.has_permission('import_violation_types') %}
+        <a href="{{ url_for('import_violation_types') }}" class="btn btn-success ms-2">
+            <i class="fas fa-file-import me-1"></i> استيراد أنواع المخالفات
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light py-3">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h5 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i> قائمة المخالفات</h5>
+            </div>
+            <div class="col-md-4">
+                <form action="{{ url_for('violations_list') }}" method="get" class="d-flex">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="بحث..." value="{{ search_query }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        {% if search_query %}
+                        <a href="{{ url_for('violations_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if violations %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center" width="5%">#</th>
+                        <th class="text-center" width="10%">الرقم الوظيفي</th>
+                        <th width="20%">اسم الموظف</th>
+                        <th width="15%">الدور الوظيفي</th>
+                        <th width="20%">نوع المخالفة</th>
+                        <th class="text-center" width="10%">رقم المخالفة</th>
+                        <th class="text-center" width="10%">التوقيع</th>
+                        <th class="text-center" width="10%">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for violation in violations %}
+                    <tr>
+                        <td class="text-center">{{ loop.index }}</td>
+                        <td class="text-center english-number">{{ violation.employee.employee_id }}</td>
+                        <td>{{ violation.employee.name }}</td>
+                        <td>{{ violation.employee.role }}</td>
+                        <td>{{ violation.violation_type.name }}</td>
+                        <td class="text-center english-number">{{ violation.violation_number }}</td>
+                        <td class="text-center">
+                            {% if violation.is_signed %}
+                            <span class="badge bg-success">تم التوقيع</span>
+                            {% else %}
+                            <span class="badge bg-danger">لم يتم التوقيع</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('violation_detail', id=violation.id) }}" class="btn btn-sm btn-info py-1 px-2" title="عرض التفاصيل">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if current_user.has_permission('edit_violation') %}
+                            <a href="{{ url_for('edit_violation', id=violation.id) }}" class="btn btn-sm btn-warning py-1 px-2" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">لا توجد مخالفات للعرض</h5>
+            <p class="text-muted">قم بإضافة مخالفة جديدة للبدء</p>
+            {% if current_user.has_permission('add_violation') %}
+            <a href="{{ url_for('new_violation') }}" class="btn btn-primary mt-2">
+                <i class="fas fa-plus-circle me-1"></i> تسجيل مخالفة جديدة
+            </a>
+
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

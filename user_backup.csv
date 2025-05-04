@@ -1,0 +1,5 @@
+﻿id,username,name,phone,password,is_admin,role
+1,admin,مدير النظام,0540538599,admin,True,admin
+2,2278,زيد سعود الرافعي,0500441616,654123,False,user
+3,2281,فهد هادي حليس العنزي,0534441593,123456,False,user
+4,4678,منيب محمد طاهر جمبي,0599420099,123456,False,user

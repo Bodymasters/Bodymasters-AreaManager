@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>استيراد بيانات النوادي من إكسل</h1>
+    <a href="{{ url_for('clubs') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-right"></i> العودة إلى قائمة النوادي
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">تحميل ملف إكسل</h5>
+            </div>
+            <div class="card-body">
+                <form action="" method="post" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">اختر ملف إكسل</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.xls,.csv" required>
+                        <div class="form-text">
+                            يجب أن يحتوي الملف على الأعمدة التالية: name (إلزامي)، manager_name, phone (اختيارية)
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> ملاحظات هامة:</h6>
+                        <ul class="mb-0">
+                            <li>سيتم تحديث بيانات النوادي الموجودة مسبقاً إذا تطابقت أسماؤها.</li>
+                            <li>سيتم إضافة النوادي الجديدة تلقائياً.</li>
+                            <li>الحد الأقصى لحجم الملف هو 16 ميجابايت.</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('download_club_template') }}" class="btn btn-success">
+                            <i class="fas fa-download"></i> تنزيل قالب إكسل
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> رفع الملف
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">تعليمات الاستيراد</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold">خطوات الاستيراد:</h6>
+                <ol>
+                    <li>قم بتنزيل قالب إكسل من الزر أدناه.</li>
+                    <li>املأ البيانات في القالب وفقاً للأعمدة المطلوبة.</li>
+                    <li>احفظ الملف بتنسيق Excel (.xlsx) أو CSV.</li>
+                    <li>قم بتحميل الملف باستخدام النموذج المجاور.</li>
+                </ol>
+
+                <h6 class="fw-bold mt-4">الأعمدة المطلوبة:</h6>
+                <ul>
+                    <li><strong>name:</strong> اسم النادي (إلزامي)</li>
+                    <li><strong>manager_name:</strong> مدير النادي (اختياري)</li>
+                    <li><strong>phone:</strong> رقم الهاتف (اختياري)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

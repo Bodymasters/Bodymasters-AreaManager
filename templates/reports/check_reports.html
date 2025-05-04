@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    /* تنسيق شريط التقدم */
+    .progress {
+        height: 28px;
+        margin-bottom: 0;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* تنسيق النص داخل شريط التقدم */
+    .progress-bar {
+        font-size: 15px;
+        font-weight: bold;
+        line-height: 28px;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+
+    /* تنسيق الجدول */
+    .report-table th, .report-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* تنسيق خلايا الجدول */
+    .report-table td {
+        padding: 10px;
+    }
+
+    /* تنسيق عنوان الجدول */
+    .report-table th {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* تنسيق صفوف الجدول */
+    .report-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /* تنسيق الخلايا عند التحويم */
+    .report-table tr:hover td {
+        background-color: #e9ecef;
+    }
+
+    /* تنسيق بطاقات المرافق */
+    .facility-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        height: 100%;
+    }
+
+    .facility-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* تنسيق رأس البطاقة */
+    .facility-card .card-header {
+        border-radius: 10px 10px 0 0;
+        font-weight: bold;
+    }
+
+    /* تنسيق النسب المئوية */
+    .percentage-high {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .percentage-medium {
+        color: #ffc107;
+        font-weight: bold;
+    }
+
+    .percentage-low {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    /* تنسيق أزرار التصفية */
+    .filter-form select, .filter-form button {
+        margin-bottom: 10px;
+    }
+
+    /* تنسيق الرسم البياني */
+    .chart-container {
+        height: 400px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<!-- إضافة مكتبة Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-chart-bar me-2"></i> تقارير التشيك</h2>
+        <div>
+            <a href="{{ url_for('checks_clubs_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-right me-1"></i> العودة إلى التشيكات
+            </a>
+        </div>
+    </div>
+
+    <!-- نموذج التصفية -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ url_for('check_reports') }}" class="row g-3 filter-form">
+                <div class="row">
+                    <div class="col">
+                        <label for="month" class="form-label">الشهر</label>
+                        <select class="form-select" id="month" name="month">
+                            {% for month_item in months %}
+                            <option value="{{ month_item.value }}" {% if month_item.value == selected_month %}selected{% endif %}>{{ month_item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="year" class="form-label">السنة</label>
+                        <select class="form-select" id="year" name="year">
+                            {% for year_item in years %}
+                            <option value="{{ year_item }}" {% if year_item == selected_year %}selected{% endif %}>{{ year_item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="club_id" class="form-label">النادي</label>
+                        <select class="form-select" id="club_id" name="club_id">
+                            <option value="">جميع الأندية</option>
+                            {% for club in clubs %}
+                            <option value="{{ club.id }}" {% if club.id == selected_club_id %}selected{% endif %}>{{ club.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="facility_id" class="form-label">المرفق</label>
+                        <select class="form-select" id="facility_id" name="facility_id">
+                            <option value="">جميع المرافق</option>
+                            {% for facility in facilities %}
+                            <option value="{{ facility.id }}" {% if facility.id == selected_facility_id %}selected{% endif %}>{{ facility.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if current_user.is_admin or current_user.username == 'admin' %}
+                    <div class="col">
+                        <label for="user_id" class="form-label">المستخدم</label>
+                        <select class="form-select" id="user_id" name="user_id">
+                            <option value="">جميع المستخدمين</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if user.id == selected_user_id %}selected{% endif %}>{{ user.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col d-flex align-items-end">
+                        <div>
+                            <button type="submit" class="btn btn-primary px-3">
+                                <i class="fas fa-filter me-1"></i> تصفية
+                            </button>
+                            <a href="{{ url_for('check_reports') }}" class="btn btn-secondary px-3 ms-2">
+                                <i class="fas fa-redo me-1"></i> إعادة تعيين
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if report_data %}
+    <!-- الرسم البياني (تم إخفاؤه مؤقتاً) -->
+    <div class="card shadow-lg mb-4" style="display: none;">
+        <div class="card-header bg-primary py-3">
+            <h4 class="mb-0 text-white"><i class="fas fa-chart-bar me-2"></i> مقارنة نسب الامتثال للمرافق</h4>
+        </div>
+        <div class="card-body">
+            <div id="chartContainer" style="height: 400px;">
+                <canvas id="complianceChart" style="width: 100%; height: 100%;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول البيانات -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary py-3">
+            <h4 class="mb-0 text-white"><i class="fas fa-table me-2"></i> تفاصيل نسب الامتثال</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered report-table">
+                    <colgroup>
+                        <col style="width: 10%;"> <!-- عمود النادي بعرض 10% -->
+                        {% for facility in facilities %}
+                        {% if not selected_facility_id or facility.id == selected_facility_id %}
+                        <col style="width: {{ 90 / (facilities|length) }}%;"> <!-- أعمدة المرافق متساوية في العرض -->
+                        {% endif %}
+                        {% endfor %}
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="vertical-align: middle; text-align: center; background-color: #0d6efd; color: white;">النادي</th>
+                            {% for facility in facilities %}
+                            {% if not selected_facility_id or facility.id == selected_facility_id %}
+                            <th style="background-color: #0d6efd; color: white; text-align: center;">{{ facility.name }}</th>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        {% for club_id, club_info in report_data.items() %}
+                        <tr>
+                            <td style="text-align: right;">{{ club_info.club_name }}</td>
+                            {% for facility in facilities %}
+                            {% if not selected_facility_id or facility.id == selected_facility_id %}
+                            <td>
+                                {% if facility.id in club_info.facilities %}
+                                {% set percentage = club_info.facilities[facility.id].percentage %} <!-- النسبة المئوية هي بالفعل عدد صحيح -->
+                                <span class="fw-bold" style="
+                                    color: #000000;
+                                    font-size: 16px;
+                                    display: inline-block;
+                                    width: 100%;
+                                    padding: 5px;
+                                    border-radius: 4px;
+                                    {% if percentage >= 90 %}
+                                        background-color: rgba(40, 167, 69, 0.7);
+                                    {% elif percentage >= 80 %}
+                                        background-color: rgba(76, 175, 80, 0.7);
+                                    {% elif percentage >= 70 %}
+                                        background-color: rgba(139, 195, 74, 0.7);
+                                    {% elif percentage >= 60 %}
+                                        background-color: rgba(205, 220, 57, 0.7);
+                                    {% elif percentage >= 50 %}
+                                        background-color: rgba(255, 235, 59, 0.7);
+                                    {% elif percentage >= 40 %}
+                                        background-color: rgba(255, 193, 7, 0.7);
+                                    {% elif percentage >= 30 %}
+                                        background-color: rgba(255, 152, 0, 0.7);
+                                    {% elif percentage >= 20 %}
+                                        background-color: rgba(255, 87, 34, 0.7);
+                                    {% elif percentage > 0 %}
+                                        background-color: rgba(244, 67, 54, 0.7);
+                                    {% else %}
+                                        background-color: rgba(150, 150, 150, 0.7);
+                                    {% endif %}
+                                ">{{ percentage }}%</span>
+                                {% else %}
+                                <span class="text-muted">غير متوفر</span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- تم إلغاء بطاقات المرافق بناءً على طلب المستخدم -->
+    {% else %}
+    <div class="alert alert-info text-center py-5">
+        <i class="fas fa-info-circle fa-3x mb-3"></i>
+        <h4>لا توجد بيانات للعرض</h4>
+        <p>لا توجد بيانات تشيك متاحة للفترة المحددة. يرجى تغيير معايير التصفية أو التأكد من وجود تشيكات مسجلة.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% if report_data %}
+<script>
+    // انتظار تحميل الصفحة بالكامل
+    window.onload = function() {
+        // بيانات الرسم البياني
+        var labels = [
+            {% for club_id, club_info in report_data.items() %}
+                "{{ club_info.club_name }}",
+            {% endfor %}
+        ];
+
+        var datasets = [
+            {% for facility in facilities %}
+            {% if not selected_facility_id or facility.id == selected_facility_id %}
+            {
+                label: "{{ facility.name }}",
+                data: [
+                    {% for club_id, club_info in report_data.items() %}
+                    {% if facility.id in club_info.facilities %}
+                        {{ club_info.facilities[facility.id].percentage }},
+                    {% else %}
+                        0,
+                    {% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: "rgba({{ loop.index0 * 50 % 255 }}, {{ 100 + loop.index0 * 40 % 155 }}, {{ 150 + loop.index0 * 30 % 105 }}, 0.2)",
+                borderColor: "rgba({{ loop.index0 * 50 % 255 }}, {{ 100 + loop.index0 * 40 % 155 }}, {{ 150 + loop.index0 * 30 % 105 }}, 1)",
+                borderWidth: 1
+            },
+            {% endif %}
+            {% endfor %}
+        ];
+
+        // التحقق من وجود بيانات
+        if (datasets.length === 0 || labels.length === 0) {
+            document.getElementById('chartContainer').innerHTML = '<div class="alert alert-info text-center py-5"><i class="fas fa-info-circle fa-3x mb-3"></i><h4>لا توجد بيانات للعرض</h4><p>لا توجد بيانات متاحة للرسم البياني.</p></div>';
+            return;
+        }
+
+        // إنشاء الرسم البياني
+        var ctx = document.getElementById('complianceChart');
+        if (!ctx) {
+            console.error('لم يتم العثور على عنصر الرسم البياني');
+            return;
+        }
+
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'نسبة الامتثال (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'الأندية'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'نسب الامتثال للمرافق حسب النادي',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ": " + context.raw + "%";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    };
+</script>
+{% endif %}
+{% endblock %}

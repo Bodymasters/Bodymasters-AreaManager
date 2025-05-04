@@ -1,0 +1,214 @@
+/* تنسيق بطاقة المبيعات في الصفحة الرئيسية */
+.sales-card-grid {
+    display: grid;
+    grid-template-areas:
+        "sales target progress"
+        "btn btn btn";
+    grid-template-columns: 1fr 1fr 1.8fr;
+    grid-template-rows: auto 40px;
+    grid-gap: 4px;
+    height: 100%;
+}
+
+.sales-section {
+    grid-area: sales;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+}
+
+.target-section {
+    grid-area: target;
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
+.progress-container {
+    grid-area: progress;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 10px;
+    width: 100%;
+}
+
+.btn-section {
+    grid-area: btn;
+    align-self: end;
+    justify-self: start;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.btn-section .btn {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 15px;
+    background-color: white;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.sales-card .card-title {
+    font-size: 1rem !important;
+    text-align: right;
+    margin-bottom: 0;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.sales-card .card-text {
+    font-size: 1.4rem !important;
+    font-weight: 700;
+    margin: 0;
+    direction: ltr !important;
+    text-align: left !important;
+    display: inline-block;
+}
+
+/* تنسيق شريط التقدم */
+.progress-container .progress {
+    height: 25px;
+    border-radius: 12px;
+    background-color: rgba(246, 244, 244, 0.2);
+    width: 100%;
+    margin-right: 0;
+}
+
+.progress-container .progress-bar {
+    border-radius: 12px;
+    background-color: #17a2b8;
+}
+
+/* تنسيق نص النسبة المئوية */
+.progress-container .percentage-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    min-width: 50px;
+    text-align: center;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+/* تنسيق عنوان البطاقة */
+.dashboard-card .card-title {
+    font-size: 1.5rem; /* تكبير حجم الخط من 1rem إلى 1.5rem */
+    font-weight: 602;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+/* تنسيق زر البطاقة */
+.dashboard-card .btn {
+    font-size: 0.8rem;
+    padding: 0.22rem 0.75rem;
+
+
+}
+
+/* تنسيق عام للبطاقات */
+.dashboard-card {
+    height: 190px; /* تغيير من 100% إلى auto لتقليل الطول */
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    max-height: 230px; /* تحديد الحد الأقصى للطول */
+    margin-bottom: 0;
+    width: 100%; /* تأكيد أن البطاقة تأخذ العرض الكامل */
+}
+
+/* تنسيق جسم البطاقة */
+.dashboard-card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1rem; /* تقليل التباعد الداخلي */
+    position: relative; /* لتمكين وضع الزر بشكل مطلق */
+}
+
+/* تنسيق منطقة الأزرار */
+.dashboard-card .btn-container {
+    margin-top: 15px;
+    margin-bottom: 0.35rem;
+    padding-top: 3px; /* إضافة مسافة للأعلى لتنزيل الأزرار للأسفل */
+    text-align: center; /* توسيط الأزرار */
+}
+
+/* تنسيق خاص لبطاقة المبيعات */
+.sales-card.dashboard-card {
+    height: 120px;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* تنسيق الأرقام في البطاقات الأخرى */
+.dashboard-card .card-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+/* تنسيق الرسم البياني */
+.chart-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* تنسيق أزرار التبديل */
+.chart-toggle-buttons {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.chart-toggle-buttons .btn {
+    margin: 0 3px;
+    min-width: 90px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+/* تنسيق بطاقات الإحصائيات */
+.stats-container .card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.stats-container .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stats-container .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.stats-container .card-text {
+    font-size: 2rem !important;
+    font-weight: 700;
+    margin: 0;
+    direction: ltr !important;
+    text-align: center !important;
+}
+
+.stats-container .currency-symbol {
+    font-size: 1rem;
+    vertical-align: middle;
+    margin-left: 5px;
+}

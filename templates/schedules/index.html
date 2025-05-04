@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 no-print">
+    <div>
+        <h1>دوام موظفي {{ club.name }}</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('clubs') }}">النوادي</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('club_detail', id=club.id) }}">{{ club.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">جداول الدوام</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{{ url_for('new_schedule', club_id=club.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> إضافة جدول دوام
+        </a>
+        <button onclick="printSchedules()" class="btn btn-success">
+            <i class="fas fa-print me-1"></i> طباعة
+        </button>
+        <a href="{{ url_for('club_detail', id=club.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة للنادي
+        </a>
+    </div>
+</div>
+
+{% if employees_by_position %}
+    {% for position in ordered_positions %}
+        {% set employees = employees_by_position[position] %}
+    <div class="card mb-4 shadow-sm">
+        <!-- عنوان الطباعة لكل بطاقة (يظهر فقط عند الطباعة) -->
+        <div class="card-print-header print-only" style="display: none; text-align: center; margin-bottom: 10px;">
+            <h2>جدول دوام {{ position }} - <span class="current-month"></span></h2>
+            <h3>{{ club.name }}</h3>
+        </div>
+        <div class="card-header bg-primary" style="color: black !important;">
+            <h4 class="mb-0 fs-4">{{ position }}</h4>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0 fs-6">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th style="width: 2%; text-align: center; background-color:rgb(143, 182, 244);">#</th>
+                            <th style="width: 7%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">الرقم الوظيفي</th>
+                            <th style="width: 14%; text-align: center; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">الاسم</th>
+                            <th style="width: 8%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">الدور الوظيفي</th>
+                            <th style="width: 8%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">رقم الجوال</th>
+                            <th style="width: 5%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">نوع الدوام</th>
+                            <th style="width: 6%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">ساعات العمل</th>
+                            <th style="width: 7%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">الدوام 1</th>
+                            <th style="width: 7%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">الدوام 2</th>
+                            <th style="width: 12%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">أيام الدوام</th>
+                            <th style="width: 8%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">أيام الإجازة</th>
+                            <th style="width: 10%; background-color:rgb(143, 182, 244);font-weight: bold;color: #000000;">أيام التخصيص</th>
+                            <th style="width: 6%; background-color:rgb(143, 182, 244); font-weight: bold;color: #000000;">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr class="text-center">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ employee.employee_id }}</td>
+                            <td style="text-align: right;">{{ employee.name }}</td>
+                            <td>{{ employee.role }}</td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {{ schedules_by_employee[employee.id].mobile_number or employee.phone or '-' }}
+                                {% else %}
+                                    {{ employee.phone or '-' }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {% if schedule.shift_type == 'two_shifts' %}
+                                        فترتين
+                                    {% else %}
+                                        فترة واحدة
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {{ schedule.work_hours }} ساعات
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {% if schedule.shift1_start and schedule.shift1_end %}
+                                        {{ schedule.shift1_start }} - {{ schedule.shift1_end }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {% if schedule.shift_type == 'two_shifts' and schedule.shift2_start and schedule.shift2_end %}
+                                        {{ schedule.shift2_start }} - {{ schedule.shift2_end }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {% if schedule.work_days %}
+                                        {{ schedule.work_days|replace(',', ' - ') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {% if schedule.off_days %}
+                                        {{ schedule.off_days|replace(',', ' - ') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td style="text-align: center;">
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    {% if schedule.allocation_day %}
+                                        {% if schedule.allocation_day.startswith('{') %}
+                                            {% set allocation_data = schedule.allocation_day|fromjson %}
+
+                                            {% if allocation_data and allocation_data.get('days_count') == '1' %}
+                                                {% if allocation_data.get('day1') and allocation_data.get('day1').get('days') %}
+                                                    <div style="font-weight: bold;">{{ allocation_data.get('day1').get('days')|join(' - ') }}</div>
+                                                    <div style="color: #666; font-size: 0.9em;">{{ allocation_data.get('day1').get('from') }} - {{ allocation_data.get('day1').get('to') }}</div>
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            {% else %}
+                                                {% if allocation_data.get('day1') and allocation_data.get('day1').get('days') and allocation_data.get('day2') and allocation_data.get('day2').get('days') %}
+                                                    <table style="width: 100%; margin: 0 auto; border-collapse: collapse;">
+                                                        <tr >
+                                                            <td style="padding: 2px; text-align: center;">{{ allocation_data.get('day1').get('days')|join(' - ') }}</td>
+                                                            <td style="padding: 2px; text-align: center;">{{ allocation_data.get('day2').get('days')|join(' - ') }}</td>
+                                                        </tr>
+                                                        <tr style="color: #666; font-size: 0.9em;">
+                                                            <td style="padding: 2px; text-align: center;">{{ allocation_data.get('day1').get('from') }} - {{ allocation_data.get('day1').get('to') }}</td>
+                                                            <td style="padding: 2px; text-align: center;">{{ allocation_data.get('day2').get('from') }} - {{ allocation_data.get('day2').get('to') }}</td>
+                                                        </tr>
+                                                    </table>
+                                                {% else %}
+                                                    {% if allocation_data.get('day1') and  allocation_data.get('day1').get('days') %}
+                                                        <div >{{ allocation_data.get('day1').get('days')|join(' - ') }}</div>
+                                                        <div style="color: #666; font-size: 0.9em;">{{ allocation_data.get('day1').get('from') }} - {{ allocation_data.get('day1').get('to') }}</div>
+                                                    {% endif %}
+                                                    {% if allocation_data.get('day2') and allocation_data.get('day2').get('days') %}
+                                                        <div style="font-weight: bold; margin-top: 5px; border-top: 1px dashed #ddd; padding-top: 3px;">{{ allocation_data.get('day2').get('days')|join(' - ') }}</div>
+                                                        <div style="color: #666; font-size: 0.9em;">{{ allocation_data.get('day2').get('from') }} - {{ allocation_data.get('day2').get('to') }}</div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ schedule.allocation_day|replace(',', ' - ') }}
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="actions-column">
+                                {% if employee.id in schedules_by_employee %}
+                                    {% set schedule = schedules_by_employee[employee.id] %}
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('edit_schedule', club_id=club.id, schedule_id=schedule.id) }}" class="btn btn-sm btn-warning" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" title="حذف"
+                                                onclick="confirmDelete('{{ url_for('delete_schedule', club_id=club.id, schedule_id=schedule.id) }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <a href="{{ url_for('new_schedule', club_id=club.id) }}?employee_id={{ employee.id }}" class="btn btn-sm btn-primary" title="إضافة جدول">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> لا يوجد موظفين في هذا النادي.
+    </div>
+{% endif %}
+
+<!-- نموذج تأكيد الحذف -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">تأكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                هل أنت متأكد من حذف جدول الدوام هذا؟
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="btn btn-danger">حذف</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- أنماط الطباعة -->
+<style media="print">
+    @page {
+        size: A4 landscape; /* تغيير اتجاه الطباعة إلى العرض */
+        margin: 0.5cm; /* هوامش مناسبة للصفحة */
+    }
+
+    body {
+        font-size: 7px; /* تصغير حجم الخط أكثر */
+        margin: 0;
+        padding: 0;
+        font-weight: normal; /* جعل الخط رفيع */
+    }
+
+    /* إخفاء شريط التنقل */
+    nav, .navbar, header, footer {
+        display: none !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 5px;
+        border: 1px solid #ddd;
+        max-width: 100%;
+        height: auto; /* ارتفاع تلقائي بناءً على المحتوى */
+        margin-top: 0; /* إزالة الهامش العلوي */
+    }
+
+    /* إلغاء فواصل الصفحات بين البطاقات */
+    .card:not(:last-child) {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    /* التأكد من عدم وجود فاصل صفحة بعد البطاقة الأخيرة */
+    .card:last-child, .last-card {
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    /* إظهار عنوان الطباعة لكل بطاقة */
+    .card-print-header {
+        display: block !important;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .card-print-header h2 {
+        font-size: 10px;
+        font-weight: normal;
+        margin-bottom: 2px;
+    }
+
+    .card-print-header h3 {
+        font-size: 8px;
+        margin-bottom: 5px;
+        font-weight: normal;
+    }
+
+    .card-header {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+        border-bottom: 1px solid #ddd;
+        padding: 3px; /* تقليل الهامش الداخلي لعنوان البطاقة */
+    }
+
+    /* تغيير لون الخط في عنوان البطاقة إلى الأسود */
+    .card-header h4 {
+        color: #000 !important;
+    }
+
+    /* تقليل المسافة بين عنوان البطاقة والجدول */
+    .card-body {
+        padding: 0;
+    }
+
+    /* تنسيق الجدول وحجم الخط */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 5px; /* تصغير حجم الخط في الجدول أكثر */
+        table-layout: fixed; /* لتثبيت عرض الأعمدة */
+        font-weight: normal; /* جعل الخط رفيع */
+    }
+
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 1px; /* تقليل الهامش الداخلي للخلايا أكثر */
+        text-align: center;
+        height: auto; /* السماح للخلايا بالتكيف مع المحتوى */
+        font-weight: normal; /* جعل الخط رفيع */
+    }
+
+    /* محاذاة النص في عمود الاسم */
+    .table td:nth-child(3) {
+        text-align: right; /* محاذاة الأسماء إلى اليمين */
+    }
+
+    .table th:nth-child(3) {
+        text-align: center; /* محاذاة عنوان العمود في الوسط */
+    }
+
+    .table thead th {
+        background-color: #f8f9fa !important;
+        font-weight: normal; /* جعل الخط رفيع بدلاً من عريض */
+    }
+
+    .breadcrumb, .modal, .btn-group {
+        display: none !important;
+    }
+
+    .print-header {
+        text-align: center;
+        margin-bottom: 5px; /* تقليل المسافة بين العنوان والمحتوى */
+        display: block !important;
+        position: static; /* تغيير من running(header) إلى static */
+    }
+
+    .print-header h1 {
+        font-size: 10px;
+        margin-bottom: 3px;
+        margin-top: 0;
+        font-weight: normal;
+    }
+
+    .print-header h2 {
+        font-size: 8px;
+        margin-bottom: 5px;
+        font-weight: normal;
+    }
+
+    /* تصغير حجم الخط في عناوين البطاقات */
+    .card-header h4 {
+        font-size: 8px !important;
+        margin: 0 !important;
+        font-weight: normal !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    /* تعديل عرض الأعمدة للطباعة */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 2%; } /* # */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 6%; } /* الرقم الوظيفي */
+    .table th:nth-child(3) { width: 14%; text-align: center !important; } /* عنوان عمود الاسم */
+    .table td:nth-child(3) { width: 14%; text-align: right !important; } /* محتوى عمود الاسم */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 7%; } /* الدور الوظيفي */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 7%; } /* رقم الجوال */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 5%; } /* نوع الدوام */
+    .table th:nth-child(7), .table td:nth-child(7) { width: 5%; } /* ساعات العمل */
+    .table th:nth-child(8), .table td:nth-child(8) { width: 6%; } /* الدوام 1 */
+    .table th:nth-child(9), .table td:nth-child(9) { width: 6%; } /* الدوام 2 */
+    .table th:nth-child(10), .table td:nth-child(10) { width: 15%; } /* أيام الدوام */
+    .table th:nth-child(11), .table td:nth-child(11) { width: 15%; } /* أيام الإجازة */
+    .table th:nth-child(12), .table td:nth-child(12) { width: 15%; } /* أيام التخصيص */
+    .table th:nth-child(13), .table td:nth-child(13) { display: none; } /* إجراءات */
+}
+</style>
+
+<!-- عنوان الطباعة الرئيسي (يظهر فقط عند الطباعة) -->
+<div class="print-header print-only" style="display: none;">
+    <h1>جداول دوام موظفي {{ club.name }}</h1>
+</div>
+
+<script>
+    function confirmDelete(url) {
+        document.getElementById('deleteForm').action = url;
+        var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+    }
+
+    function printSchedules() {
+        // الحصول على اسم الشهر الحالي بالعربية
+        var today = new Date();
+        var monthNames = [
+            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        ];
+        var currentMonth = monthNames[today.getMonth()];
+
+        // تحديث اسم الشهر في جميع البطاقات
+        document.querySelectorAll('.current-month').forEach(function(el) {
+            el.textContent = currentMonth + ' ' + today.getFullYear();
+        });
+
+        // إضافة فئة no-print للعناصر التي لا نريد طباعتها
+        document.querySelectorAll('.btn, .breadcrumb, .btn-group, nav, .navbar, header, footer').forEach(function(el) {
+            el.classList.add('no-print');
+        });
+
+        // إخفاء شريط التنقل بشكل مباشر
+        var navElements = document.querySelectorAll('nav, .navbar, header, footer');
+        for (var i = 0; i < navElements.length; i++) {
+            navElements[i].style.display = 'none';
+        }
+
+        // إلغاء فواصل الصفحات بين البطاقات
+        var cards = document.querySelectorAll('.card');
+        for (var i = 0; i < cards.length; i++) {
+            cards[i].style.pageBreakAfter = 'auto';
+            cards[i].style.breakAfter = 'auto';
+            cards[i].style.marginTop = '0';
+            cards[i].style.marginBottom = '10px';
+        }
+
+        // إضافة عنصر style للتأكيد على الطباعة بعرض الورقة ومنع الصفحات الفارغة
+        var printStyle = document.createElement('style');
+        printStyle.id = 'print-style';
+        printStyle.innerHTML = `
+            @page {
+                size: landscape;
+                margin: 0.5cm;
+            }
+            @page:blank {
+                display: none;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                font-weight: normal;
+                font-size: 6px;
+            }
+            .print-header {
+                display: block !important;
+                margin-top: 0;
+                margin-bottom: 5px;
+            }
+        `;
+        document.head.appendChild(printStyle);
+
+        // إظهار عنوان الطباعة
+        var printHeader = document.querySelector('.print-header');
+        if (printHeader) {
+            printHeader.style.display = 'block';
+        }
+
+        // طباعة الصفحة
+        window.print();
+
+        // إزالة فئة no-print وأنماط الطباعة بعد الطباعة
+        setTimeout(function() {
+            document.querySelectorAll('.no-print').forEach(function(el) {
+                el.classList.remove('no-print');
+            });
+            if (document.getElementById('print-style')) {
+                document.head.removeChild(document.getElementById('print-style'));
+            }
+            if (printHeader) {
+                printHeader.style.display = 'none';
+            }
+        }, 1000);
+    }
+</script>
+{% endblock %}

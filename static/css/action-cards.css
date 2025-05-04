@@ -1,0 +1,55 @@
+/* تنسيق بطاقات الإجراءات */
+.action-card {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.action-card .row {
+    margin: 0;
+}
+
+.action-card .action-title {
+    background-color: #f8f9fa;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.action-card .action-button {
+    padding: 12px 15px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    height: 100%;
+    width: 100%;
+}
+
+.action-card .action-button:hover {
+    opacity: 0.9;
+}
+
+.action-card .action-button i {
+    margin-left: 8px;
+}
+
+.action-card .action-button.view-button {
+    background-color: #17a2b8;
+}
+
+.action-card .action-button.add-button {
+    background-color: #28a745;
+}
+
+/* تنسيق النص ليكون في صف واحد */
+.action-button-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

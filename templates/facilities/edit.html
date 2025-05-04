@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">تعديل بيانات المرفق</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('facilities') }}">المرافق</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('facility_detail', id=facility.id) }}">{{ facility.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">تعديل</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ url_for('facility_detail', id=facility.id) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-right me-1"></i> العودة إلى التفاصيل
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="fas fa-edit me-2"></i> تعديل بيانات المرفق</h4>
+                <span class="badge bg-dark">رقم {{ facility.id }}</span>
+            </div>
+            <div class="card-body">
+                <form action="" method="post" novalidate>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">اسم المرفق <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-swimming-pool"></i></span>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ facility.name }}" required>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        الحقول المعلمة بعلامة <span class="text-danger">*</span> إلزامية
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('facility_detail', id=facility.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> حفظ التغييرات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> معلومات المرفق</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="display-4 text-primary">
+                        <i class="fas fa-swimming-pool"></i>
+                    </div>
+                    <h4>{{ facility.name }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

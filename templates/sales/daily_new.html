@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-calendar-plus me-2"></i> إضافة مبيعات يومية</h2>
+        <a href="{{ url_for('sales_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى قائمة المبيعات
+        </a>
+    </div>
+
+    <!-- نموذج إضافة مبيعات -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-plus-circle me-2"></i> مبيعات جديدة</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('new_daily_sales') }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="club_id" class="form-label">النادي <span class="text-danger">*</span></label>
+                            <select class="form-select" id="club_id" name="club_id" required style="font-size: 20px;">
+                                <option value="" disabled {% if not selected_club %}selected{% endif %}>اختر النادي...</option>
+                                {% for club in clubs %}
+                                <option value="{{ club.id }}" {% if selected_club and selected_club.id == club.id %}selected{% endif %}>{{ club.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="sale_date" class="form-label">التاريخ <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="sale_date" name="sale_date" value="{{ current_date }}" style="height: 45px; font-size: 20px; text-align: center; direction: ltr;" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">مبلغ المبيعات <span class="text-danger">*</span></label>
+                            <div class="input-group" >
+                                <input type="text" class="form-control english-number numeric-input" id="amount" name="amount" required style="font-size: 20px;">
+                                <span class="input-group-text">ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        <i class="fas fa-save me-1"></i> حفظ المبيعات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* تنسيق حقل التاريخ */
+    #sale_date {
+        font-family: Arial, sans-serif !important;
+        direction: ltr !important;
+    }
+
+    /* إزالة أسهم حقل الرقم */
+    input[type="text"].numeric-input::-webkit-inner-spin-button,
+    input[type="text"].numeric-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="text"].numeric-input {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إضافة معالجة لحقل المبلغ للتأكد من أنه دائمًا باللغة الإنجليزية
+        document.getElementById('amount').addEventListener('input', function() {
+            // التأكد من أن القيمة هي أرقام فقط
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+
+        // تعيين لغة حقل التاريخ للإنجليزية
+        document.getElementById('sale_date').lang = 'en';
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-3">تعديل التشيك</h1>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('check_detail', id=check.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى تفاصيل التشيك
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <i class="fas fa-clipboard-check me-1"></i> بيانات التشيك
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('edit_check', id=check.id) }}" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">النادي</label>
+                                <input type="text" class="form-control" value="{{ check.club.name }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">ملاحظات عامة</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="1">{{ check.notes or '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% for facility, items in facilities_with_items.items() %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-building me-2"></i> {{ facility.name }}</h5>
+                            <div>
+                                <span class="me-2">عدد البنود: <strong>{{ items|length }}</strong></span>
+                                <span class="me-2">مطابق: <strong class="text-light compliant-count">{{ items|selectattr('is_compliant', 'eq', true)|list|length }}</strong></span>
+                                <span>غير مطابق: <strong class="text-light non-compliant-count">{{ items|selectattr('is_compliant', 'eq', false)|list|length }}</strong></span>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50%">اسم البند</th>
+                                            <th style="width: 15%" class="text-center">الحالة</th>
+                                            <th style="width: 25%">ملاحظات</th>
+                                            <th style="width: 10%">صورة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in items %}
+                                        <tr>
+                                            <td>{{ item.facility_item.name }}</td>
+                                            <td class="text-center">
+                                                <div class="form-check d-flex justify-content-center">
+                                                    <input class="form-check-input compliance-checkbox" style="width: 1.5em; height: 1.5em;"
+                                                        type="checkbox" id="item_{{ item.facility_item_id }}" name="item_{{ item.facility_item_id }}"
+                                                        data-facility-id="{{ facility.id }}" data-item-id="{{ item.facility_item_id }}"
+                                                        {% if item.is_compliant %}checked{% endif %}
+                                                        onclick="if(this.checked) { this.nextElementSibling.querySelector('.compliance-status').innerHTML = '<span class=\'text-success\'>مطابق</span>'; } else { this.nextElementSibling.querySelector('.compliance-status').innerHTML = '<span class=\'text-danger\'>غير مطابق</span>'; } updateFacilityCounters({{ facility.id }});">
+                                                    <label class="form-check-label ms-2" for="item_{{ item.facility_item_id }}">
+                                                        {% if item.is_compliant %}
+                                                        <span class="compliance-status text-success">مطابق</span>
+                                                        {% else %}
+                                                        <span class="compliance-status text-danger">غير مطابق</span>
+                                                        {% endif %}
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" id="notes_{{ item.facility_item_id }}"
+                                                       name="notes_{{ item.facility_item_id }}" placeholder="ملاحظات..."
+                                                       value="{{ item.notes or '' }}">
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="file" class="d-none image-upload" id="image_{{ item.facility_item_id }}"
+                                                       name="image_{{ item.facility_item_id }}" accept="image/*" onchange="showImageIndicator(this)">
+                                                <label for="image_{{ item.facility_item_id }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-camera"></i>
+                                                </label>
+                                                <span id="image_indicator_{{ item.facility_item_id }}" class="image-indicator ms-2" style="display: none;">
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                </span>
+                                                {% if item.images %}
+                                                <a href="{{ url_for('uploaded_file', filename=item.images[0].image_path) }}"
+                                                   target="_blank" class="btn btn-sm btn-info ms-1">
+                                                    <i class="fas fa-image"></i>
+                                                </a>
+                                                {% endif %}
+                                                <div id="image_error_{{ item.facility_item_id }}" class="text-danger mt-1" style="display: none;">
+                                                    <small>فشل تحميل الصورة</small>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> حفظ التعديلات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // دالة لإظهار مؤشر اختيار الصورة
+    function showImageIndicator(input) {
+        // الحصول على معرف البند من معرف حقل الصورة
+        const itemId = input.id.replace('image_', '');
+        const indicatorElement = document.getElementById('image_indicator_' + itemId);
+        const errorElement = document.getElementById('image_error_' + itemId);
+
+        // إخفاء رسالة الخطأ دائماً عند تغيير الملف
+        if (errorElement) {
+            errorElement.style.display = 'none';
+        }
+
+        // إظهار المؤشر إذا تم اختيار ملف
+        if (input.files && input.files[0]) {
+            // التحقق من نوع الملف
+            const fileType = input.files[0].type;
+            if (fileType.startsWith('image/')) {
+                indicatorElement.style.display = 'inline-block';
+            } else {
+                // إظهار رسالة خطأ إذا كان الملف ليس صورة
+                if (errorElement) {
+                    errorElement.style.display = 'block';
+                    errorElement.innerHTML = '<small>يجب اختيار ملف صورة فقط</small>';
+                }
+                // إفراغ حقل الملف
+                input.value = '';
+            }
+        } else {
+            indicatorElement.style.display = 'none';
+        }
+    }
+
+    // دالة لتحديث حالة الـ checkbox والعدادات
+    function updateCheckboxStatus(checkbox) {
+        // تحديث نص حالة المطابقة
+        const statusElement = checkbox.nextElementSibling.querySelector('.compliance-status');
+        if (checkbox.checked) {
+            statusElement.innerHTML = '<span class="text-success">مطابق</span>';
+        } else {
+            statusElement.innerHTML = '<span class="text-danger">غير مطابق</span>';
+        }
+
+        // الحصول على معرف المرفق
+        const facilityId = checkbox.getAttribute('data-facility-id');
+
+        // تحديث العدادات فوراً
+        updateFacilityCounters(facilityId);
+    }
+
+    // دالة لتحديث عدادات المرفق مباشرة
+    function updateFacilityCounters(facilityId) {
+        // العثور على جميع الـ checkboxes التي تنتمي لهذا المرفق
+        const checkboxes = document.querySelectorAll(`.compliance-checkbox[data-facility-id="${facilityId}"]`);
+
+        if (checkboxes.length > 0) {
+            // حساب العدادات
+            const totalItems = checkboxes.length;
+            let compliantItems = 0;
+
+            // عد البنود المطابقة
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    compliantItems++;
+                }
+            });
+
+            const nonCompliantItems = totalItems - compliantItems;
+
+            // العثور على بطاقة المرفق
+            const facilityCard = checkboxes[0].closest('.card');
+
+            // تحديث العدادات في الواجهة
+            const compliantCountElement = facilityCard.querySelector('.compliant-count');
+            const nonCompliantCountElement = facilityCard.querySelector('.non-compliant-count');
+
+            if (compliantCountElement) compliantCountElement.textContent = compliantItems;
+            if (nonCompliantCountElement) nonCompliantCountElement.textContent = nonCompliantItems;
+
+            console.log(`Updated facility ${facilityId}: Total=${totalItems}, Compliant=${compliantItems}, Non-Compliant=${nonCompliantItems}`);
+        }
+    }
+
+    $(document).ready(function() {
+        // تهيئة العدادات لكل المرافق عند تحميل الصفحة
+        console.log('Page loaded, initializing counters...');
+
+        // التأكد من تحديث العدادات بعد تحميل الصفحة بالكامل
+        function initializeCounters() {
+            // جمع كل معرفات المرافق الفريدة
+            const facilityIds = [];
+            $('.compliance-checkbox').each(function() {
+                const facilityId = $(this).data('facility-id');
+                if (facilityId && facilityIds.indexOf(facilityId) === -1) {
+                    facilityIds.push(facilityId);
+                }
+            });
+
+            if (facilityIds.length === 0) {
+                console.warn('No facility IDs found, retrying in 200ms...');
+                setTimeout(initializeCounters, 200);
+                return;
+            }
+
+            // تحديث العدادات لكل مرفق
+            facilityIds.forEach(function(facilityId) {
+                updateFacilityCounters(facilityId);
+            });
+
+            console.log('Successfully initialized counters for facilities:', facilityIds);
+        }
+
+        // بدء التهيئة بعد تحميل الصفحة
+        setTimeout(initializeCounters, 300);
+
+        // التحقق من حقول الصور عند تحميل الصفحة
+        $('.image-upload').each(function() {
+            showImageIndicator(this);
+        });
+    });
+</script>
+{% endblock %}

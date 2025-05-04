@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>إضافة نادي جديد</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('clubs') }}">النوادي</a></li>
+                <li class="breadcrumb-item active" aria-current="page">إضافة نادي جديد</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ url_for('clubs') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-right"></i> العودة إلى قائمة النوادي
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i> إضافة نادي جديد</h4>
+            </div>
+            <div class="card-body">
+                <form action="" method="post" novalidate>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">اسم النادي <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-building"></i></span>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="مثال: نادي الرياض" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="manager_name" class="form-label">اسم المدير</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                                <input type="text" class="form-control" id="manager_name" name="manager_name" placeholder="مثال: أحمد محمد">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">رقم الهاتف</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input type="text" class="form-control" id="phone" name="phone" placeholder="مثال: 0501234567">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">مرافق النادي</label>
+                        <div class="border rounded p-3">
+                            <div class="row">
+                                {% for facility in facilities %}
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="facilities" value="{{ facility.id }}" id="facility{{ facility.id }}">
+                                        <label class="form-check-label" for="facility{{ facility.id }}">
+                                            {{ facility.name }}
+                                            {% if not facility.is_active %}
+                                            <span class="badge bg-danger ms-1">معطل</span>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">اختر المرافق المتوفرة في هذا النادي</small>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        الحقول المعلمة بعلامة <span class="text-danger">*</span> إلزامية
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('clubs') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i> نصائح</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        استخدم اسمًا واضحًا ومميزًا للنادي
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        اكتب الموقع بشكل تفصيلي
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        تأكد من صحة رقم الهاتف
+                    </li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    يمكنك أيضًا استيراد النوادي من ملف إكسل من خلال صفحة <a href="{{ url_for('import_clubs_excel') }}" class="alert-link">استيراد من إكسل</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

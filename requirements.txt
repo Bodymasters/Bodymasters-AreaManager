@@ -1,0 +1,9 @@
+pandas
+flask
+flask-sqlalchemy
+flask-login
+flask-migrate
+flask-wtf
+werkzeug
+python-dotenv
+psycopg2-binary

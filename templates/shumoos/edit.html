@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    /* إزالة أسهم الزيادة والنقصان من حقول الأرقام */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    /* تأكيد على استخدام الأرقام الإنجليزية */
+    .english-number {
+        direction: ltr !important;
+        text-align: center !important;
+        font-family: 'Arial', sans-serif !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-sun me-2"></i> تعديل سجل شموس</h2>
+        <div>
+            <a href="{{ url_for('shumoos_list') }}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل شموس
+            </a>
+            <a href="{{ url_for('shumoos_record_detail', id=shumoos_record.id) }}" class="btn btn-info">
+                <i class="fas fa-eye me-1"></i> عرض التفاصيل
+            </a>
+        </div>
+    </div>
+
+    <!-- نموذج تعديل السجل -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-edit me-2"></i> تعديل سجل - {{ shumoos_record.club.name }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('edit_shumoos', id=shumoos_record.id) }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">النادي</label>
+                            <input type="text" class="form-control" value="{{ shumoos_record.club.name }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="registered_count" class="form-label">العدد المسجل في النظام <span class="text-danger">*</span></label>
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" class="form-control english-number text-center" id="registered_count" name="registered_count" value="{{ shumoos_record.registered_count }}" required style="font-size: 20px; font-weight: bold; -moz-appearance: textfield;">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="registration_date" class="form-label">تاريخ التسجيل</label>
+                            <input type="text" class="form-control english-number" id="registration_date" name="registration_date" value="{{ shumoos_record.registration_date.strftime('%B %d, %Y') }}" readonly style="font-size: 20px; font-weight: bold; text-align: center !important; direction: ltr; display: block; margin: auto;">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-1"></i> حفظ التغييرات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

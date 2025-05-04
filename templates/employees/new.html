@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-1">إضافة موظف جديد</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('employees') }}">الموظفين</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">إضافة موظف جديد</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ url_for('employees') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى القائمة
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i> بيانات الموظف الجديد</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('new_employee') }}">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="employee_id" class="form-label">الرقم الوظيفي <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                    <input type="text" class="form-control" id="employee_id" name="employee_id" required placeholder="مثال: EMP001">
+                                </div>
+                                <small class="text-muted">يجب أن يكون الرقم الوظيفي فريداً</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">اسم الموظف <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="name" name="name" required placeholder="الاسم الكامل">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="position" class="form-label">الوظيفة <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                    <select class="form-select" id="position" name="position" required>
+                                        <option value="" selected disabled>اختر الوظيفة</option>
+
+                                        <option value="خدمة عملاء">خدمة عملاء</option>
+                                        <option value="مدرب">مدرب</option>
+                                        <option value="عامل">عامل</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="role" class="form-label">الدور الوظيفي <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="" selected disabled>اختر الدور الوظيفي</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            // قواميس الأدوار الوظيفية لكل وظيفة
+                            const rolesByPosition = {
+                                'خدمة عملاء': [
+                                    'مدير نادي',
+                                    'نائب مدير نادي مكلف',
+                                    'خدمة عملاء',
+                                    'اختصاصي تسويق',
+                                    'منسق عمليات'
+                                ],
+                                'مدرب': [
+                                    'مدرب كمال أجسام',
+                                    'مدرب سباحة',
+                                    'مدرب لياقة',
+                                    'مدير لياقة',
+                                    'مدرب رياضي',
+                                    'مدرب لياقة وكمال اجسام',
+                                    'مساعد مدرب'
+                                ],
+                                'عامل': [
+                                    'مشرف عمال',
+                                    'عامل نظافة'
+                                ]
+                            };
+
+                            // تحديث خيارات الدور الوظيفي بناءً على الوظيفة المحددة
+                            function updateRoles() {
+                                const positionSelect = document.getElementById('position');
+                                const roleSelect = document.getElementById('role');
+                                const selectedPosition = positionSelect.value;
+
+                                // إفراغ قائمة الأدوار الوظيفية
+                                roleSelect.innerHTML = '<option value="" selected disabled>اختر الدور الوظيفي</option>';
+
+                                // إضافة الأدوار الوظيفية المناسبة
+                                if (selectedPosition && rolesByPosition[selectedPosition]) {
+                                    rolesByPosition[selectedPosition].forEach(role => {
+                                        const option = document.createElement('option');
+                                        option.value = role;
+                                        option.textContent = role;
+                                        roleSelect.appendChild(option);
+                                    });
+                                }
+                            }
+
+                            // تسجيل حدث تغيير الوظيفة
+                            document.getElementById('position').addEventListener('change', updateRoles);
+
+                            // تهيئة القائمة عند تحميل الصفحة
+                            document.addEventListener('DOMContentLoaded', updateRoles);
+                        </script>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">رقم الهاتف</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <input type="text" class="form-control" id="phone" name="phone" placeholder="مثال: 0501234567">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="club_id" class="form-label">النادي <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                <select class="form-select" id="club_id" name="club_id" required>
+                                    <option value="" selected disabled>اختر النادي</option>
+                                    {% for club in clubs %}
+                                    <option value="{{ club.id }}">{{ club.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                                <label class="form-check-label" for="is_active">
+                                    الموظف نشط
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> حفظ البيانات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

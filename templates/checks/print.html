@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طباعة التشيك</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container-fluid print-container">
+    <div class="print-header text-center mb-0">
+        <h4 class="mt-0 mb-0">تفاصيل التشيك - نظام إدارة مدير المنطقة</h4>
+        <p class="mb-0" style="font-size: 10pt;">تاريخ التشيك: {{ check.check_date.strftime('%Y-%m-%d') }}</p>
+    </div>
+
+    <!-- معلومات التشيك في صف واحد -->
+    <div class="info-table mb-0">
+        <table class="table table-bordered table-sm mb-0">
+            <tr>
+                <th class="text-center" style="width: 20%;">رقم التشيك</th>
+                <td class="text-center" style="width: 30%;">{{ check.id }}</td>
+                <th class="text-center" style="width: 20%;">النادي</th>
+                <td class="text-center" style="width: 30%;">{{ check.club.name }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- نسبة المطابقة -->
+    <div class="compliance-section mb-0">
+        <h6 class="text-center mb-0" style="font-size: 10pt;">نسبة المطابقة</h6>
+        <div class="progress mb-0" style="height: 15px;">
+            <div class="progress-bar {% if compliance_percentage < 50 %}bg-danger{% elif compliance_percentage < 80 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar"
+                 style="width: {{ compliance_percentage }}%;"
+                 aria-valuenow="{{ compliance_percentage }}"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+                <span style="font-weight: bold; font-size: 9px;">{{ "%.1f"|format(compliance_percentage) }}%</span>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between" style="font-size: 8pt;">
+            <span>مطابق: <strong class="text-success">{{ compliant_items }}</strong></span>
+            <span>غير مطابق: <strong class="text-danger">{{ non_compliant_items }}</strong></span>
+            <span>الإجمالي: <strong>{{ total_items }}</strong></span>
+        </div>
+    </div>
+
+    <!-- ملاحظات التشيك -->
+    {% if check.notes %}
+    <div class="notes-section mb-0">
+        <div class="alert alert-info mb-0 p-1" style="font-size: 9pt;">
+            <strong>ملاحظات:</strong> {{ check.notes }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- بنود التشيك -->
+    {% for facility, items in facilities_with_items.items() %}
+    <div class="facility-section mb-0">
+        <div class="facility-header p-1" style="background-color: #f8f9fa; border: 1px solid #ddd;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0" style="font-size: 9pt;">{{ facility.name }}</h6>
+                <div class="d-flex align-items-center">
+                    {% set facility_items = items|length %}
+                    {% set facility_compliant_items = items|selectattr('is_compliant', 'eq', true)|list|length %}
+                    {% set facility_non_compliant_items = facility_items - facility_compliant_items %}
+                    {% set facility_compliance_percentage = (facility_compliant_items / facility_items * 100) if facility_items > 0 else 0 %}
+                    <div style="font-size: 7pt;" class="me-2">
+                        <span class="me-1">عدد البنود: <strong>{{ facility_items }}</strong></span>
+                        <span class="me-1">مطابق: <strong class="text-success">{{ facility_compliant_items }}</strong></span>
+                        <span>غير مطابق: <strong class="text-danger">{{ facility_non_compliant_items }}</strong></span>
+                    </div>
+                    <div class="progress" style="width: 60px; height: 12px;">
+                        <div class="progress-bar {% if facility_compliance_percentage < 50 %}bg-danger{% elif facility_compliance_percentage < 80 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar"
+                             style="width: {{ facility_compliance_percentage }}%;"
+                             aria-valuenow="{{ facility_compliance_percentage }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            <span style="font-size: 8px; font-weight: bold; text-shadow: 0.5px 0.5px 0.5px rgba(0,0,0,0.5);">{{ "%.1f"|format(facility_compliance_percentage) }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-sm table-bordered mb-0" style="font-size: 8pt;">
+            <thead>
+                <tr>
+                    <th style="width: 50%">اسم البند</th>
+                    <th style="width: 15%" class="text-center">الحالة</th>
+                    <th style="width: 35%">ملاحظات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.facility_item.name }}</td>
+                    <td class="text-center">
+                        {% if item.is_compliant %}
+                        <span class="badge bg-success" style="font-size: 7pt;">مطابق</span>
+                        {% else %}
+                        <span class="badge bg-danger" style="font-size: 7pt;">غير مطابق</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.notes or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    {% endfor %}
+
+    <div class="text-center mt-2 mb-2">
+        <button onclick="window.print()" class="btn btn-primary btn-sm">
+            <i class="fas fa-print me-1"></i> طباعة
+        </button>
+        <button onclick="window.close()" class="btn btn-secondary btn-sm ms-2">
+            <i class="fas fa-times me-1"></i> إغلاق
+        </button>
+    </div>
+</div>
+
+
+<style>
+    /* تنسيق عام للصفحة */
+    body {
+        font-family: 'Cairo', sans-serif;
+        direction: rtl;
+    }
+
+    /* تنسيق الطباعة */
+    @media print {
+        /* إخفاء العناصر غير المطلوبة في الطباعة */
+        .btn, .navbar, footer, header, nav, .bg-primary, .navbar-toggler {
+            display: none !important;
+        }
+
+        /* إخفاء الشريط الأزرق */
+        .bg-primary, nav.navbar, .navbar-nav, .navbar-toggler, .navbar-collapse {
+            display: none !important;
+        }
+
+        /* تنسيق عام للصفحة */
+        body {
+            font-size: 12pt !important;
+            color: #000 !important;
+            background-color: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        /* توسيع المحتوى ليملأ الصفحة */
+        .container, .container-fluid {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* تنسيق البطاقات والأقسام */
+        .card, .facility-section, .compliance-section, .notes-section, .info-table {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+            width: 100% !important;
+        }
+
+        .facility-header, .facility-footer {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+            padding: 2px !important;
+            font-size: 9pt !important;
+        }
+
+        .card-body, .facility-body {
+            padding: 2px !important;
+        }
+
+        /* تنسيق الجداول */
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        th, td {
+            border: 1px solid #ddd !important;
+            padding: 3px !important;
+            text-align: center !important;
+            font-size: 9pt !important;
+        }
+
+        th {
+            background-color: #f8f9fa !important;
+            font-weight: bold !important;
+            font-size: 9pt !important;
+        }
+
+        /* تنسيق شريط التقدم */
+        .progress {
+            height: 15px !important;
+            background-color: #f0f0f0 !important;
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .progress-bar.bg-success {
+            background-color: #28a745 !important;
+        }
+
+        .progress-bar.bg-warning {
+            background-color: #ffc107 !important;
+        }
+
+        .progress-bar.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        /* تنسيق الشارات */
+        .badge.bg-success {
+            background-color: #28a745 !important;
+            color: #fff !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+            color: #fff !important;
+        }
+
+        /* تنسيق النصوص */
+        .text-success {
+            color: #28a745 !important;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        /* تنسيق الصفحة للطباعة */
+        @page {
+            size: A4;
+            margin: 0.2cm;
+        }
+
+        /* تنسيق العناوين */
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* تنسيق الصفوف والأعمدة */
+        .row {
+            display: flex !important;
+            width: 100% !important;
+            margin: 0 !important;
+        }
+
+        .col, .col-md-4, .col-md-6, .col-md-8, .col-md-12 {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+    }
+</style>
+
+<script>
+    // طباعة تلقائية عند تحميل الصفحة
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    });
+</script>
+</body>
+</html>

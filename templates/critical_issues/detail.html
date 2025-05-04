@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>تفاصيل العطل الحرج</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('critical_issues_list') }}">الأعطال الحرجة</a></li>
+                <li class="breadcrumb-item active" aria-current="page">تفاصيل العطل</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{{ url_for('edit_critical_issue', id=issue.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> تعديل
+        </a>
+        <a href="{{ url_for('critical_issues_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى القائمة
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> معلومات العطل</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <h6 class="fw-bold">النادي:</h6>
+                        <p>
+                            <a href="{{ url_for('club_detail', id=issue.club.id) }}" class="text-decoration-none fw-bold text-primary">
+                                {{ issue.club.name }}
+                            </a>
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="fw-bold">المرفق:</h6>
+                        <p>غير محدد</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="fw-bold">رقم الطلب:</h6>
+                        <p>{{ issue.ticket_number }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">تاريخ إنشاء الطلب:</h6>
+                        <p>{{ issue.creation_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">تاريخ الاستحقاق:</h6>
+                        <p>{{ issue.due_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">الحالة:</h6>
+                        <p>
+                            {% if issue.status == 'تمت الصيانة' %}
+                                <span class="badge bg-success">{{ issue.status }}</span>
+                            {% elif issue.status == 'معلقة' %}
+                                <span class="badge bg-warning text-dark">{{ issue.status }}</span>
+                            {% elif issue.status == 'تخطت تاريخ الاستحقاق' %}
+                                <span class="badge bg-danger">{{ issue.status }}</span>
+                            {% elif issue.status == 'اغلاق الطلب بدون صيانة' %}
+                                <span class="badge bg-secondary">{{ issue.status }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ issue.status }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">تاريخ الإضافة:</h6>
+                        <p>{{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold">ملاحظات:</h6>
+                        <p>{{ issue.notes or 'لا توجد ملاحظات' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-cog me-2"></i> إجراءات</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('edit_critical_issue', id=issue.id) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> تعديل العطل
+                    </a>
+                    <a href="{{ url_for('delete_critical_issue', id=issue.id) }}" class="btn btn-danger" onclick="return confirm('هل أنت متأكد من حذف العطل الحرج؟')">
+                        <i class="fas fa-trash me-1"></i> حذف العطل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

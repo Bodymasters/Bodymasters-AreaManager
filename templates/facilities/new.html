@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">إضافة مرفق جديد</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('facilities') }}">المرافق</a></li>
+                <li class="breadcrumb-item active" aria-current="page">إضافة مرفق جديد</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ url_for('facilities') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-right me-1"></i> العودة إلى المرافق
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i> إضافة مرفق جديد</h4>
+            </div>
+            <div class="card-body">
+                <form action="" method="post" novalidate>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">اسم المرفق <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-swimming-pool"></i></span>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="مثال: مسبح" required>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        الحقول المعلمة بعلامة <span class="text-danger">*</span> إلزامية
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('facilities') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i> نصائح</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        استخدم اسماً واضحاً ومميزاً للمرفق
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        يمكنك إضافة أنواع مختلفة من المرافق مثل: مسبح، ملعب كرة قدم، صالة رياضية، إلخ
+                    </li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    يمكنك أيضاً استيراد المرافق من ملف إكسل من خلال صفحة <a href="{{ url_for('import_facilities_excel') }}" class="alert-link">استيراد من إكسل</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

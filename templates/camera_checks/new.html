@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-3">متابعة كاميرات جديدة</h1>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{% if selected_club_id %}{{ url_for('camera_checks_club_detail', club_id=selected_club_id) }}{% else %}{{ url_for('camera_checks_clubs_list') }}{% endif %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى {% if selected_club_id %}سجل متابعة النادي{% else %}قائمة الأندية{% endif %}
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <i class="fas fa-video me-1"></i> بيانات المتابعة
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% if selected_club_id %}{{ url_for('new_camera_check_for_club', club_id=selected_club_id) }}{% else %}{{ url_for('new_camera_check') }}{% endif %}">
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="club_id" class="form-label">النادي</label>
+                                <select class="form-select" id="club_id" name="club_id" required>
+                                    <option value="" disabled {% if not selected_club_id %}selected{% endif %}>اختر النادي</option>
+                                    {% for club in clubs %}
+                                    <option value="{{ club.id }}" {% if selected_club_id and selected_club_id|int == club.id %}selected{% endif %}>{{ club.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">فترات المتابعة</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-center">افتتاح النادي</th>
+                                            {% for time_slot in time_slots %}
+                                            <th class="text-center">{{ time_slot }}</th>
+                                            {% endfor %}
+                                            <th class="text-center">عدد المخالفات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="form-check d-flex justify-content-center">
+                                                    <input class="form-check-input" style="width: 1.5em; height: 1.5em;" type="checkbox" id="club_open" name="club_open">
+                                                </div>
+                                            </td>
+                                            {% for time_slot in time_slots %}
+                                            <td>
+                                                <div class="form-check d-flex justify-content-center">
+                                                    <input class="form-check-input" style="width: 1.5em; height: 1.5em;" type="checkbox" id="time_slot_{{ time_slot }}" name="time_slot_{{ time_slot }}">
+                                                </div>
+                                            </td>
+                                            {% endfor %}
+                                            <td>
+                                                <input type="text" class="form-control text-center" id="violations_count" name="violations_count" value="" style="-webkit-appearance: none; -moz-appearance: textfield;">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">ملاحظات</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> حفظ المتابعة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // لا حاجة لأي كود JavaScript هنا بعد التعديلات
+</script>
+{% endblock %}

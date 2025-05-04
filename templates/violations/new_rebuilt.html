@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- إضافة تنسيق التقويم المخصص كبير الحجم -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/big-calendar.css') }}">
+<style>
+    /* تكبير حجم الخط في جميع الحقول */
+    .form-control, .form-select, .input-group-text, .form-label {
+        font-size: 18px !important;
+    }
+
+    /* تكبير حجم الخط في القوائم المنسدلة */
+    select.form-select option {
+        font-size: 18px !important;
+    }
+
+    /* تكبير حجم الخط في مناطق النص */
+    textarea.form-control {
+        font-size: 18px !important;
+    }
+
+    /* تكبير حجم الخط في العلامات والنصوص الصغيرة */
+    .form-check-label, small {
+        font-size: 16px !important;
+    }
+
+    /* تكبير حجم الخط في الأزرار */
+    .btn {
+        font-size: 18px !important;
+    }
+
+    /* زيادة ارتفاع الحقول لتناسب حجم الخط الأكبر */
+    .form-control, .form-select {
+        height: 45px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">تسجيل مخالفة جديدة</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('violations_list') }}">سجل المخالفات</a></li>
+                <li class="breadcrumb-item active" aria-current="page">تسجيل مخالفة جديدة</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        {% if current_user.has_permission('import_violation_types') %}
+        <a href="{{ url_for('import_violation_types') }}" class="btn btn-success me-2">
+            <i class="fas fa-file-import me-1"></i> استيراد أنواع المخالفات
+        </a>
+        {% endif %}
+        <a href="{{ url_for('violations_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل المخالفات
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i> تسجيل مخالفة جديدة</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('new_violation') }}" method="post" enctype="multipart/form-data" id="violation-form">
+                    <!-- حقول مخفية لتخزين بيانات الموظف -->
+                    <input type="hidden" id="employee_id_hidden" name="employee_id_hidden" value="{{ employee.employee_id if employee else '' }}">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="employee_id" class="form-label">الرقم الوظيفي <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                <input type="text" class="form-control english-number" id="employee_id" name="employee_id" required placeholder="أدخل الرقم الوظيفي" value="{{ employee.employee_id if employee else '' }}">
+                                <button type="button" class="btn btn-primary" id="fetch-employee-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="employee_name" class="form-label">اسم الموظف</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="employee_name" readonly value="{{ employee.name if employee else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="employee_role" class="form-label">الدور الوظيفي</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                <input type="text" class="form-control" id="employee_role" readonly value="{{ employee.role if employee else '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="club_name" class="form-label">النادي</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                <input type="text" class="form-control" id="club_name" readonly value="{{ employee.club.name if employee else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="violation_number" class="form-label">رقم المخالفة</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                <input type="text" class="form-control english-number" id="violation_number" readonly value="{{ violations_count + 1 if violations_count is defined else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="violation_type_id" class="form-label">نوع المخالفة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-exclamation-triangle"></i></span>
+                                <select class="form-select" id="violation_type_id" name="violation_type_id" required>
+                                    <option value="" selected disabled>-- اختر نوع المخالفة --</option>
+                                    {% for type in violation_types %}
+                                    <option value="{{ type.id }}">{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="violation_source" class="form-label">مصدر المخالفة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                <select class="form-select" id="violation_source" name="violation_source" required>
+                                    <option value="" selected disabled>-- اختر مصدر المخالفة --</option>
+                                    {% for source in violation_sources %}
+                                    <option value="{{ source }}">{{ source }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="violation_date" class="form-label">تاريخ المخالفة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control english-input" id="violation_date" name="violation_date" required value="{{ current_date }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="is_signed" class="form-label d-block">تم التوقيع</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_signed" name="is_signed" style="width: 3em; height: 1.5em;">
+                                <label class="form-check-label" for="is_signed">نعم، تم التوقيع على المخالفة</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="image" class="form-label">صورة المخالفة</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            </div>
+                            <small class="text-muted">يمكنك تحميل صورة للمخالفة (اختياري)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="notes" class="form-label">ملاحظات</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-sticky-note"></i></span>
+                                <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" {% if not pre_filled %}disabled{% endif %}>
+                            <i class="fas fa-save me-1"></i> حفظ المخالفة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- إضافة سكريبت التقويم المخصص كبير الحجم -->
+<script src="{{ url_for('static', filename='js/big-calendar.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('تم تحميل الصفحة بنجاح');
+        
+        // تعيين لغة حقول التاريخ للإنجليزية
+        const violationDateInput = document.getElementById('violation_date');
+        if (violationDateInput) {
+            violationDateInput.lang = 'en';
+            violationDateInput.setAttribute('data-date', '');
+            violationDateInput.addEventListener('click', function() {
+                this.showPicker();
+            });
+        }
+        
+        // تحديد العناصر
+        const employeeIdInput = document.getElementById('employee_id');
+        const fetchEmployeeBtn = document.getElementById('fetch-employee-btn');
+        const employeeNameInput = document.getElementById('employee_name');
+        const employeeRoleInput = document.getElementById('employee_role');
+        const clubNameInput = document.getElementById('club_name');
+        const violationNumberInput = document.getElementById('violation_number');
+        const employeeIdHidden = document.getElementById('employee_id_hidden');
+        const submitButton = document.querySelector('button[type="submit"]');
+        
+        // التحقق من وجود العناصر
+        if (!employeeIdInput || !fetchEmployeeBtn || !employeeNameInput || !employeeRoleInput || !clubNameInput || !violationNumberInput) {
+            console.error('بعض عناصر النموذج غير موجودة');
+            return;
+        }
+        
+        console.log('تم العثور على جميع عناصر النموذج');
+        
+        // إضافة مستمع الحدث للنقر على زر البحث
+        fetchEmployeeBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            console.log('تم النقر على زر البحث');
+            searchEmployee();
+        });
+        
+        // إضافة مستمع الحدث للضغط على Enter في حقل الرقم الوظيفي
+        employeeIdInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                console.log('تم الضغط على Enter في حقل الرقم الوظيفي');
+                searchEmployee();
+            }
+        });
+        
+        // دالة البحث عن الموظف
+        function searchEmployee() {
+            // الحصول على الرقم الوظيفي
+            const employeeId = employeeIdInput.value.trim();
+            
+            // التحقق من وجود رقم وظيفي
+            if (!employeeId) {
+                alert('الرجاء إدخال الرقم الوظيفي');
+                return;
+            }
+            
+            console.log(`البحث عن الموظف برقم: ${employeeId}`);
+            
+            // تغيير شكل الزر لإظهار حالة التحميل
+            fetchEmployeeBtn.disabled = true;
+            fetchEmployeeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            // إنشاء نموذج جديد
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url_for("new_violation") }}';
+            
+            // إضافة حقل الرقم الوظيفي
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'employee_id';
+            input.value = employeeId;
+            form.appendChild(input);
+            
+            // إضافة حقل للإشارة إلى أن هذا طلب بحث
+            const searchFlag = document.createElement('input');
+            searchFlag.type = 'hidden';
+            searchFlag.name = 'search_only';
+            searchFlag.value = 'true';
+            form.appendChild(searchFlag);
+            
+            // إضافة النموذج إلى الصفحة وإرساله
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+        // تمكين زر الحفظ إذا كانت البيانات موجودة
+        if (employeeNameInput.value && employeeRoleInput.value && clubNameInput.value) {
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+        }
+    });
+</script>
+{% endblock %}

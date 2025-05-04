@@ -1,0 +1,93 @@
+/* تثبيت شريط التنقل بشكل نهائي وقاطع */
+
+/* تعطيل أي تأثيرات حركة على شريط التنقل */
+.navbar.fixed-top {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 1030 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 45px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+    
+    /* منع أي حركة أو انتقال بشكل قاطع */
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    will-change: auto !important;
+    -webkit-transform: none !important;
+    -webkit-transition: none !important;
+    -webkit-animation: none !important;
+    
+    /* تعطيل أي تأثيرات CSS3 */
+    backface-visibility: visible !important;
+    perspective: none !important;
+    transform-style: flat !important;
+    
+    /* تعطيل أي تأثيرات حركة بشكل كامل */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* إضافة padding للجسم لمنع تداخل المحتوى مع شريط التنقل */
+body {
+    padding-top: 55px !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+}
+
+/* إضافة هامش للمحتوى الرئيسي */
+main.container-fluid {
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+}
+
+/* تعطيل أي تأثيرات حركة على شريط التنقل في جميع أحجام الشاشات */
+@media (min-width: 992px), (max-width: 991.98px) {
+    .navbar.fixed-top {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        transition: none !important;
+        animation: none !important;
+        will-change: auto !important;
+    }
+    
+    body {
+        padding-top: 55px !important;
+    }
+    
+    /* تأكيد عدم تداخل المحتوى مع شريط التنقل */
+    .btn-toolbar, .card, .page-header, h1, h2, h3 {
+        margin-top: 10px !important;
+    }
+}
+
+/* تعطيل أي تأثيرات حركة على شريط التنقل بشكل كامل */
+html.js-focus-visible .navbar.fixed-top,
+html.js-focus-visible body .navbar.fixed-top,
+html.js-focus-visible body main .navbar.fixed-top,
+html.js-focus-visible body div .navbar.fixed-top,
+html.js-focus-visible body section .navbar.fixed-top,
+html.js-focus-visible body header .navbar.fixed-top,
+html.js-focus-visible body footer .navbar.fixed-top,
+html.js-focus-visible body nav .navbar.fixed-top,
+html.js-focus-visible body article .navbar.fixed-top,
+html.js-focus-visible body aside .navbar.fixed-top,
+html.js-focus-visible body * .navbar.fixed-top {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    will-change: auto !important;
+}

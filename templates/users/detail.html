@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-3 fw-bold">تفاصيل المستخدم</h1>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('users') }}" class="btn btn-secondary btn-lg me-1">
+            <i class="fas fa-arrow-right me-1"></i> العودة
+        </a>
+        <a href="{{ url_for('edit_user', id=user.id) }}" class="btn btn-warning btn-lg me-1">
+            <i class="fas fa-edit me-1"></i> تعديل
+        </a>
+        <a href="{{ url_for('user_permissions', id=user.id) }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shield-alt me-1"></i> الصلاحيات
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="card-title mb-0 fw-bold"><i class="fas fa-user me-2"></i>{{ user.name }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-box bg-primary text-white rounded-circle p-2 me-2">
+                                <i class="fas fa-id-badge"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">الرقم الوظيفي</small>
+                                <strong class="fs-5">{{ user.username }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-box bg-primary text-white rounded-circle p-2 me-2">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">رقم الهاتف</small>
+                                <strong class="fs-5">{{ user.phone }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-box bg-primary text-white rounded-circle p-2 me-2">
+                                <i class="fas fa-user-tag"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">الدور</small>
+                                {% if user.role == 'admin' %}
+                                <span class="badge bg-danger fs-6">مسؤول النظام</span>
+                                {% elif user.role == 'manager' %}
+                                <span class="badge bg-warning text-dark fs-6">مدير</span>
+                                {% elif user.role == 'supervisor' %}
+                                <span class="badge bg-info fs-6">مشرف</span>
+                                {% else %}
+                                <span class="badge bg-success fs-6">مستخدم عادي</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-box bg-primary text-white rounded-circle p-2 me-2">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">الأندية</small>
+                                <div>
+                                    {% for club in user.clubs %}
+                                    <span class="badge bg-primary me-1 fs-6">{{ club.name }}</span>
+                                    {% else %}
+                                    <span class="text-muted">لا توجد أندية مرتبطة</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .icon-box {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}

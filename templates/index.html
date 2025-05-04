@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="mb-4">لوحة التحكم</h3>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-5 g-4">
+    <div class="col">
+        <div class="card text-white bg-primary dashboard-card">
+            <div class="card-body">
+                <h5 class="card-title">الأندية</h5>
+                <p class="card-text display-4">{{ clubs_count }}</p>
+            </div>
+            <div class="btn-container">
+                <a href="{{ url_for('clubs') }}" class="btn btn-light">عرض الأندية</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-danger dashboard-card">
+            <div class="card-body">
+                <h5 class="card-title">الأعطال الحرجة</h5>
+                <p class="card-text display-4">{{ facilities_count if facilities_count is defined else 0 }}</p>
+            </div>
+            <div class="btn-container">
+                <a href="{{ url_for('critical_issues_list') }}" class="btn btn-light">عرض الأعطال</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-warning dashboard-card">
+            <div class="card-body">
+                <h5 class="card-title">الموظفين</h5>
+                <p class="card-text display-4">{{ employees_count }}</p>
+            </div>
+            <div class="btn-container">
+                <a href="{{ url_for('employees') }}" class="btn btn-light">عرض الموظفين</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-info dashboard-card">
+            <div class="card-body">
+                <h5 class="card-title">مخالفات شهر {{ current_month_name }}</h5>
+                <p class="card-text display-4">{{ violations_count }}</p>
+            </div>
+            <div class="btn-container">
+                <a href="{{ url_for('violations_clubs_list') }}" class="btn btn-light">عرض المخالفات</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-secondary dashboard-card">
+            <div class="card-body">
+                <h5 class="card-title">مخالفات الكاميرات</h5>
+                <p class="card-text display-4">{{ camera_violations_count if camera_violations_count is defined else 0 }}</p>
+            </div>
+            <div class="btn-container">
+                <a href="{{ url_for('camera_checks_clubs_list') }}" class="btn btn-light">عرض المخالفات</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card text-white bg-success sales-card dashboard-card">
+            <div class="card-body">
+                <div class="sales-card-grid">
+                    <div class="sales-section">
+                        <div>
+                            <h5 class="card-title">مبيعات شهر {{ current_month_name }}:</h5>
+                            <p class="card-text">{{ camera_checks_count.amount }}</p>
+                        </div>
+                    </div>
+                    <div class="target-section">
+                        <div>
+                            <h5 class="card-title">تارجيت شهر {{ current_month_name }}:</h5>
+                            <p class="card-text">{{ camera_checks_count.target_amount }}</p>
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ camera_checks_count.percentage }}%" aria-valuenow="{{ camera_checks_count.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span class="percentage-text">{{ camera_checks_count.percentage }}%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-section">
+                <a href="{{ url_for('sales_list') }}" class="btn btn-light">عرض المبيعات</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">تحليل بيانات المبيعات</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div id="chart-title-container" class="d-flex align-items-center">
+                            <h6 class="mb-0 me-2" id="chart-title">تحليل مبيعات شهر {{ current_month_name }} حتى يوم {{ current_day }}</h6>
+                            <div class="d-flex align-items-center ms-3">
+                                <div class="me-2" style="width: 15px; height: 15px; background-color: rgba(75, 192, 192, 1); border-radius: 50%;"></div>
+                                <span class="small">المبيعات اليومية</span>
+                                <div class="me-2 ms-3" style="width: 15px; height: 2px; background-color: rgba(255, 99, 132, 1); border-style: dashed;"></div>
+                                <span class="small">الهدف اليومي</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-toggle-buttons text-start">
+                            <button class="btn btn-sm btn-outline-primary" id="week1Btn">الأسبوع الأول</button>
+                            <button class="btn btn-sm btn-outline-primary" id="week2Btn">الأسبوع الثاني</button>
+                            <button class="btn btn-sm btn-outline-primary" id="week3Btn">الأسبوع الثالث</button>
+                            <button class="btn btn-sm btn-outline-primary" id="week4Btn">الأسبوع الرابع</button>
+                            <button class="btn btn-sm btn-primary active" id="dailyBtn">الشهر كامل</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="chart-container" style="position: relative; height:450px; width:100%;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إضافة تصحيح للرسم البياني -->
+<style>
+    .chart-container {
+        position: relative;
+        height: 450px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    #salesChart {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
+
+<script>
+    // التأكد من تحميل Chart.js قبل تنفيذ الكود
+    window.onload = function() {
+        // التأكد من وجود عنصر canvas
+        const chartCanvas = document.getElementById('salesChart');
+        if (!chartCanvas) {
+            console.error('لم يتم العثور على عنصر canvas للرسم البياني');
+            return;
+        }
+
+        // التأكد من وجود Chart.js
+        if (typeof Chart === 'undefined') {
+            console.error('لم يتم تحميل مكتبة Chart.js');
+            // محاولة تحميل Chart.js ديناميكيًا
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            script.onload = initChart;
+            document.head.appendChild(script);
+            return;
+        }
+
+        // تهيئة الرسم البياني
+        initChart();
+    };
+
+    function initChart() {
+        // بيانات الأسبوع الأول من الشهر الحالي (مثال)
+        const weekOneData = {
+            labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+            datasets: [{
+                label: 'مبيعات الأسبوع الأول',
+                data: [65000, 75000, 82000, 78000, 90000, 95000, 85000],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'الهدف اليومي',
+                data: [70000, 70000, 70000, 70000, 70000, 70000, 70000],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        };
+
+        // بيانات الأسبوع الثاني من الشهر الحالي (مثال)
+        const weekTwoData = {
+            labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+            datasets: [{
+                label: 'مبيعات الأسبوع الثاني',
+                data: [70000, 80000, 75000, 85000, 95000, 90000, 80000],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'الهدف اليومي',
+                data: [70000, 70000, 70000, 70000, 70000, 70000, 70000],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        };
+
+        // بيانات الأسبوع الثالث من الشهر الحالي (مثال)
+        const weekThreeData = {
+            labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+            datasets: [{
+                label: 'مبيعات الأسبوع الثالث',
+                data: [75000, 85000, 90000, 80000, 85000, 95000, 90000],
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'الهدف اليومي',
+                data: [70000, 70000, 70000, 70000, 70000, 70000, 70000],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        };
+
+        // بيانات الأسبوع الرابع من الشهر الحالي (مثال)
+        const weekFourData = {
+            labels: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+            datasets: [{
+                label: 'مبيعات الأسبوع الرابع',
+                data: [80000, 90000, 95000, 85000, 80000, 75000, 85000],
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'الهدف اليومي',
+                data: [70000, 70000, 70000, 70000, 70000, 70000, 70000],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        };
+
+        // الحصول على اليوم الحالي من الشهر
+        const currentDate = new Date();
+        const currentDay = currentDate.getDate();
+
+        // بيانات المبيعات اليومية للشهر الحالي حتى اليوم الحالي
+        const dailyData = {
+            labels: Array.from({length: currentDay}, (_, i) => i + 1),
+            datasets: [{
+                label: 'المبيعات اليومية',
+                data: {{ camera_checks_count.daily_sales|tojson }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.1
+            }, {
+                label: 'الهدف اليومي',
+                data: Array.from({length: currentDay}, () => {{ camera_checks_count.target_daily_amount }}),
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
+        };
+
+        // إنشاء الرسم البياني
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: dailyData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 30,
+                        top: 20,
+                        bottom: 10
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: false, // إخفاء العنوان لأننا أضفناه في HTML
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('ar-SA') + ' ر.س';
+                            },
+                            font: {
+                                family: 'Cairo',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            lineWidth: 1
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                family: 'Cairo',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+
+        // الأزرار موجودة بالفعل في HTML
+
+        // وظيفة لإزالة الحالة النشطة من جميع الأزرار
+        function resetAllButtons() {
+            const buttons = ['week1Btn', 'week2Btn', 'week3Btn', 'week4Btn', 'dailyBtn'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                btn.classList.remove('active');
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-primary');
+            });
+        }
+
+        // إضافة وظائف للأزرار
+        document.getElementById('week1Btn').addEventListener('click', function() {
+            resetAllButtons();
+            this.classList.add('active');
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+
+            salesChart.data = weekOneData;
+            document.getElementById('chart-title').textContent = 'تحليل مبيعات الأسبوع الأول من شهر {{ current_month_name }}';
+            salesChart.update();
+        });
+
+        document.getElementById('week2Btn').addEventListener('click', function() {
+            resetAllButtons();
+            this.classList.add('active');
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+
+            salesChart.data = weekTwoData;
+            document.getElementById('chart-title').textContent = 'تحليل مبيعات الأسبوع الثاني من شهر {{ current_month_name }}';
+            salesChart.update();
+        });
+
+        document.getElementById('week3Btn').addEventListener('click', function() {
+            resetAllButtons();
+            this.classList.add('active');
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+
+            salesChart.data = weekThreeData;
+            document.getElementById('chart-title').textContent = 'تحليل مبيعات الأسبوع الثالث من شهر {{ current_month_name }}';
+            salesChart.update();
+        });
+
+        document.getElementById('week4Btn').addEventListener('click', function() {
+            resetAllButtons();
+            this.classList.add('active');
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+
+            salesChart.data = weekFourData;
+            document.getElementById('chart-title').textContent = 'تحليل مبيعات الأسبوع الرابع من شهر {{ current_month_name }}';
+            salesChart.update();
+        });
+
+        document.getElementById('dailyBtn').addEventListener('click', function() {
+            resetAllButtons();
+            this.classList.add('active');
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary');
+
+            salesChart.data = dailyData;
+            document.getElementById('chart-title').textContent = 'تحليل مبيعات شهر {{ current_month_name }} حتى يوم ' + currentDay;
+            salesChart.update();
+        });
+    }
+</script>
+{% endblock %}

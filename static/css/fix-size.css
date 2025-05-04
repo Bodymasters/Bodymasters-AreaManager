@@ -1,0 +1,290 @@
+/* تصحيح حجم العناصر في شريط التنقل والبطاقات */
+
+/* تكبير حجم الخط في شريط التنقل */
+.navbar-dark .navbar-nav .nav-link {
+    font-size: 1.1rem !important;
+    padding: 4px 8px !important;
+    margin: 0 1px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-weight: bold !important;
+}
+
+/* تكبير أيقونات شريط التنقل */
+.navbar-dark .navbar-nav .nav-link i {
+    font-size: 1rem !important;
+    margin-left: 3px !important;
+    margin-right: 0 !important;
+}
+
+/* تعديل حجم شريط التنقل نفسه */
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+html {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.navbar {
+    padding-top: 0.2rem !important;
+    padding-bottom: 0.2rem !important;
+    min-height: 45px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    margin: 0 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+}
+
+/* تنظيم عناصر شريط التنقل */
+.navbar-nav {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.nav-item {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* تصغير حجم الخط في البطاقات */
+.dashboard-card .card-title {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+}
+
+/* تصغير حجم الأرقام في البطاقات */
+.dashboard-card .card-text {
+    font-size: 1.6rem !important;
+}
+
+/* تصغير حجم النسبة المئوية */
+.progress-container .percentage-text {
+    font-size: 1.2rem !important;
+}
+
+/* تصغير حجم الخط في عناوين البطاقات */
+.card-header h4, .card-header h5 {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+/* تصغير حجم الخط في الأزرار */
+.btn {
+    font-size: 0.7rem !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+}
+
+/* تنسيق أزرار البطاقات */
+.dashboard-card .btn {
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    width: auto !important;
+    min-width: 80px !important;
+    text-align: center !important;
+    border-radius: 15px !important;
+}
+
+/* تنسيق حاوية الأزرار في البطاقات */
+.dashboard-card .btn-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
+}
+
+/* تصغير حجم الخط في القوائم المنسدلة */
+.dropdown-menu .dropdown-item {
+    font-size: 0.85rem !important;
+    padding: 0.4rem 1rem !important;
+}
+
+/* تصغير حجم الخط في العناوين الرئيسية */
+h1 {
+    font-size: 1.6rem !important;
+}
+
+h2 {
+    font-size: 1.4rem !important;
+}
+
+h3 {
+    font-size: 1.2rem !important;
+    margin-bottom: 1rem !important;
+}
+
+h4 {
+    font-size: 1.1rem !important;
+}
+
+/* تعديل حجم الرسم البياني */
+.chart-container {
+    padding: 15px !important;
+    margin-bottom: 15px !important;
+}
+
+/* تعديل حجم أزرار التبديل في الرسم البياني */
+.chart-toggle-buttons .btn {
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
+    min-width: 60px !important;
+    margin: 0 2px !important;
+}
+
+/* تنسيق أزرار "عرض المخالفات" وما شابهها */
+.btn-section .btn,
+.dashboard-card .btn-outline-primary,
+.dashboard-card .btn-primary {
+    font-size: 0.65rem !important;
+    padding: 2px 5px !important;
+    border-radius: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100px !important;
+    margin: 0 auto !important;
+    display: inline-block !important;
+}
+
+/* تصغير حجم البطاقات */
+.dashboard-card {
+    height: 120px !important;
+    max-height: 140px !important;
+    margin-bottom: 15px !important;
+    overflow: hidden !important;
+}
+
+/* تصغير حجم بطاقة المبيعات */
+.sales-card.dashboard-card {
+    height: 80px !important;
+}
+
+/* تعديل هوامش البطاقات */
+.dashboard-card .card-body {
+    padding: 0.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+/* تنسيق عنوان البطاقة */
+.dashboard-card .card-title {
+    margin-bottom: 0.25rem !important;
+    text-align: center !important;
+}
+
+/* تنسيق نص البطاقة */
+.dashboard-card .card-text {
+    margin-bottom: 0.25rem !important;
+    line-height: 1.2 !important;
+}
+
+/* تعديل المسافة بين البطاقات */
+.row > [class*="col-"] {
+    padding-right: 8px !important;
+    padding-left: 8px !important;
+}
+
+/* تعديل هوامش الصفوف */
+.row {
+    margin-right: -8px !important;
+    margin-left: -8px !important;
+}
+
+/* تعديل المسافة العلوية للمحتوى الرئيسي */
+main.container-fluid {
+    margin-top: 60px !important;
+    padding-top: 15px !important;
+}
+
+/* إضافة مسافة للبطاقات في أعلى الصفحة */
+.card {
+    margin-top: 10px !important;
+}
+
+/* إضافة مسافة للأزرار في أعلى الصفحة */
+.btn-toolbar, .action-buttons, .page-actions {
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
+}
+
+/* إخفاء الرسالة الحمراء في أعلى الصفحة */
+.alert-danger,
+div[style*="background-color: #f8d7da"],
+div[style*="color: #721c24"],
+div[style*="border: 1px solid #f5c6cb"] {
+    display: none !important;
+}
+
+/* تعديل حجم الخط في الجداول */
+.table {
+    font-size: 0.85rem !important;
+}
+
+.table th {
+    font-size: 0.9rem !important;
+}
+
+/* تعديل حجم الخط في النماذج */
+.form-control, .form-select {
+    font-size: 0.9rem !important;
+    padding: 0.375rem 0.75rem !important;
+}
+
+.form-label {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+/* تعديل حجم الخط في التنبيهات */
+.alert {
+    font-size: 0.9rem !important;
+    padding: 0.75rem 1rem !important;
+}
+
+/* تعديل حجم الخط في تذييل الصفحة */
+footer {
+    font-size: 0.85rem !important;
+    padding: 0.75rem 0 !important;
+}
+
+/* تنسيق أزرار الأسبوع */
+.chart-toggle-buttons .btn-outline-primary,
+.chart-toggle-buttons .btn-primary {
+    font-size: 0.65rem !important;
+    padding: 2px 5px !important;
+    margin: 0 1px !important;
+    border-radius: 10px !important;
+}
+
+/* تنسيق الأزرار المختارة */
+.chart-toggle-buttons .btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* تنسيق الأزرار غير المختارة */
+.chart-toggle-buttons .btn-outline-primary {
+    color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+/* تنسيق الأزرار عند التحويم */
+.chart-toggle-buttons .btn:hover {
+    transform: translateY(-1px) !important;
+}

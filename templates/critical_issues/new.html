@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">إضافة عطل حرج جديد</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('critical_issues_list') }}">الأعطال الحرجة</a></li>
+                <li class="breadcrumb-item active" aria-current="page">إضافة عطل جديد</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="{{ url_for('critical_issues_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل الأعطال
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> بيانات العطل الحرج</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('new_critical_issue') }}" id="critical-issue-form">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="club_id" class="form-label">النادي <span class="text-danger">*</span></label>
+                            <select class="form-select" id="club_id" name="club_id" required>
+                                <option value="" selected disabled>اختر النادي</option>
+                                {% for club in clubs %}
+                                <option value="{{ club.id }}" {% if selected_club_id and selected_club_id|int == club.id %}selected{% endif %}>{{ club.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="facility_id" class="form-label">المرفق <span class="text-danger">*</span></label>
+                            <select class="form-select" id="facility_id" name="facility_id" required>
+                                <option value="" selected disabled>اختر المرفق</option>
+                                {% for facility in facilities %}
+                                <option value="{{ facility.id }}">{{ facility.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="ticket_number" class="form-label">رقم الطلب <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ticket_number" name="ticket_number" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">الحالة <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="" selected disabled>اختر الحالة</option>
+                                {% for status in status_options %}
+                                <option value="{{ status }}">{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="creation_date" class="form-label">تاريخ إنشاء الطلب <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="creation_date" name="creation_date" value="{{ current_date }}" required lang="en">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="due_date" class="form-label">تاريخ الاستحقاق <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="date" class="form-control" id="due_date" name="due_date" required lang="en">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">ملاحظات</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="4"></textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-save me-1"></i> حفظ العطل
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+    /* تنسيق حقول التاريخ */
+    input[type="date"] {
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        direction: ltr !important;
+        height: 50px;
+        font-size: 16px;
+        text-align: center;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 0.375rem 0.75rem;
+        background-color: #fff;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    /* إخفاء أيقونة التقويم الافتراضية */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+    }
+
+    /* تنسيق أيقونة التقويم المخصصة */
+    .input-group-text {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+    .input-group-text:hover {
+        background-color: #e0e0e0;
+    }
+
+    .input-group-text .fas {
+        color: #0d6efd;
+        font-size: 18px;
+    }
+
+    /* تنسيق لإظهار الأرقام باللغة الإنجليزية */
+    input[type="date"]::-webkit-datetime-edit {
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        direction: ltr !important;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إضافة مستمع للنقر على أيقونة التقويم
+        document.querySelectorAll('.input-group-text').forEach(function(icon, index) {
+            icon.addEventListener('click', function() {
+                if (index === 0) {
+                    document.getElementById('creation_date').showPicker();
+                } else {
+                    document.getElementById('due_date').showPicker();
+                }
+            });
+        });
+
+        // تحديث قائمة المرافق عند تغيير النادي
+        const clubSelect = document.getElementById('club_id');
+        const facilitySelect = document.getElementById('facility_id');
+
+        clubSelect.addEventListener('change', function() {
+            const clubId = this.value;
+            if (clubId) {
+                // تفريغ قائمة المرافق وإضافة خيار التحميل
+                facilitySelect.innerHTML = '<option value="" selected disabled>جاري تحميل المرافق...</option>';
+                facilitySelect.disabled = true;
+
+                // طلب المرافق من الخادم
+                fetch(`/api/clubs/${clubId}/facilities`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // تفريغ القائمة وإضافة خيار الاختيار
+                        facilitySelect.innerHTML = '<option value="" selected disabled>اختر المرفق</option>';
+
+                        // إضافة المرافق إلى القائمة
+                        if (Array.isArray(data) && data.length > 0) {
+                            data.forEach(facility => {
+                                const option = document.createElement('option');
+                                option.value = facility.id;
+                                option.textContent = facility.name;
+                                facilitySelect.appendChild(option);
+                            });
+                        } else {
+                            // إذا لم تكن هناك مرافق
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.disabled = true;
+                            option.textContent = 'لا توجد مرافق لهذا النادي';
+                            facilitySelect.appendChild(option);
+                        }
+
+                        facilitySelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching facilities:', error);
+                        facilitySelect.innerHTML = '<option value="" selected disabled>حدث خطأ في تحميل المرافق</option>';
+                        facilitySelect.disabled = false;
+                    });
+            } else {
+                // إذا لم يتم اختيار نادي
+                facilitySelect.innerHTML = '<option value="" selected disabled>اختر النادي أولاً</option>';
+                facilitySelect.disabled = true;
+            }
+        });
+
+        // تشغيل الحدث إذا كان هناك نادي محدد بالفعل
+        // تأخير بسيط للتأكد من تحميل الصفحة بالكامل
+        setTimeout(function() {
+            if (clubSelect.value) {
+                clubSelect.dispatchEvent(new Event('change'));
+            }
+        }, 100);
+
+        // معالجة النموذج قبل الإرسال
+        document.getElementById('critical-issue-form').addEventListener('submit', function(e) {
+            // إيقاف الإرسال التلقائي
+            e.preventDefault();
+
+            // تحويل حقول التاريخ النصية إلى تنسيق yyyy-mm-dd قبل الإرسال
+            const creationDate = document.getElementById('creation_date');
+            const dueDate = document.getElementById('due_date');
+
+            // تحويل التاريخ من تنسيق dd/mm/yyyy إلى yyyy-mm-dd
+            if (creationDate._flatpickr && creationDate._flatpickr.selectedDates.length > 0) {
+                const date = creationDate._flatpickr.selectedDates[0];
+                const isoDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
+
+                // إنشاء حقل مخفي جديد
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = creationDate.name;
+                hiddenInput.value = isoDate;
+
+                // إضافة الحقل المخفي إلى النموذج
+                this.appendChild(hiddenInput);
+
+                // تغيير اسم الحقل الأصلي
+                creationDate.name = creationDate.name + '_display';
+            }
+
+            if (dueDate._flatpickr && dueDate._flatpickr.selectedDates.length > 0) {
+                const date = dueDate._flatpickr.selectedDates[0];
+                const isoDate = date.toISOString().split('T')[0]; // yyyy-mm-dd
+
+                // إنشاء حقل مخفي جديد
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = dueDate.name;
+                hiddenInput.value = isoDate;
+
+                // إضافة الحقل المخفي إلى النموذج
+                this.appendChild(hiddenInput);
+
+                // تغيير اسم الحقل الأصلي
+                dueDate.name = dueDate.name + '_display';
+            }
+
+            // إرسال النموذج
+            this.submit();
+        });
+    });
+</script>
+{% endblock %}

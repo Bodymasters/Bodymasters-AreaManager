@@ -1,0 +1,52 @@
+/* تثبيت شريط التنقل بشكل مباشر */
+.navbar.fixed-top {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    height: 45px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+    background-color: #0d6efd !important;
+}
+
+/* إضافة مساحة للمحتوى تحت شريط التنقل */
+body {
+    padding-top: 45px !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+}
+
+/* تنسيق أزرار الإجراءات */
+.action-buttons-container {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 5px !important;
+}
+
+.action-button {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 2px !important;
+    padding: 0 !important;
+}
+
+.action-button.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.action-button.btn-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+}
+
+.action-button.btn-info {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+}

@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-primary mb-0"><i class="fas fa-chart-line me-2"></i> تفاصيل المبيعات - {{ target.club.name }}</h4>
+        <div>
+            <a href="{{ url_for('new_daily_sales', club_id=target.club_id) }}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-1"></i> إضافة مبيعات يومية
+            </a>
+            <a href="{{ url_for('edit_sales_target', id=target.id) }}" class="btn btn-warning ms-2">
+                <i class="fas fa-edit me-1"></i> تعديل التارجيت
+            </a>
+            <form method="post" action="{{ url_for('delete_sales_target', id=target.id) }}" class="d-inline ms-2" onsubmit="return confirm('هل أنت متأكد من حذف هذا التارجيت؟ سيتم حذف جميع المبيعات اليومية المرتبطة به.');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i> حذف التارجيت
+                </button>
+            </form>
+            <a href="{{ url_for('sales_list') }}" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-right me-1"></i> العودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <!-- بطاقة متابعة المبيعات -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0"><i class="fas fa-bullseye me-2"></i> بطاقة متابعة المبيعات - {{ formatted_month }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">التارجيت المطلوب</h5>
+                                    <h3 class="text-primary mt-3">{{ "{:,.0f}".format(target.target_amount) }} ريال</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">المبلغ المحقق</h5>
+                                    <h3 class="text-success mt-3">{{ "{:,.0f}".format(achieved_amount) }} ريال</h3>
+                                    <div class="mt-2 small">
+                                        <div class="text-muted">مبيعات يومية: {{ "{:,.0f}".format(daily_sales_total) }} ريال</div>
+                                        <div class="text-muted">مبيعات الأونلاين: {{ "{:,.0f}".format(target.online_sales) }} ريال</div>
+                                        <div class="text-muted">مبيعات التدريب الشخصي: {{ "{:,.0f}".format(target.personal_training_sales) }} ريال</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">الفارق</h5>
+                                    {% if achieved_amount > target.target_amount %}
+                                        <h3 class="text-success mt-3">+{{ "{:,.0f}".format(achieved_amount - target.target_amount) }} ريال</h3>
+                                    {% else %}
+                                        <h3 class="text-danger mt-3">-{{ "{:,.0f}".format(remaining_amount) }} ريال</h3>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">النسبة المحققة</h5>
+                                    <div class="mt-3">
+                                        <div class="progress" style="height: 50px; position: relative;">
+                                            <div class="progress-bar {% if achievement_percentage < 50 %}bg-danger{% elif achievement_percentage < 80 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar" style="width: {% if achievement_percentage > 100 %}100{% else %}{{ achievement_percentage }}{% endif %}%; min-width: 2em;" aria-valuenow="{{ achievement_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">
+                                                <span style="color: #000000; font-weight: bold; font-size: 20px;  z-index: 10;">{{ achievement_percentage }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">تفاصيل التارجيت</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered mb-0">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th class="fw-bold fs-5 text-white" style="background-color: #007bff !important;">لتحقيق</th>
+                                                    <th class="fw-bold fs-5 text-white" style="background-color: #007bff !important;">الإيراد المطلوب</th>
+                                                    <th class="fw-bold fs-5 text-white" style="background-color: #007bff !important;">المبلغ المتبقى</th>
+                                                    <th class="fw-bold fs-5 text-white" style="background-color: #007bff !important;">الإيراد اليومي</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% set percentages = [80, 90, 100, 110, 120] %}
+                                                {% for percentage in percentages %}
+                                                    {% set target_amount_for_percentage = (target.target_amount * percentage / 100)|round|int %}
+                                                    {% set remaining_amount_for_percentage = (target_amount_for_percentage - achieved_amount)|round|int %}
+                                                    {% set daily_target_for_percentage = (remaining_amount_for_percentage / (days_in_month - daily_sales|length))|round|int if (days_in_month - daily_sales|length) > 0 else 0 %}
+                                                    <tr class="text-center">
+                                                        <td class="fw-bold fs-6 text-black">{{ percentage }}%</td>
+                                                        <td class="fw-bold fs-6 text-black">{{ "{:,.0f}".format(target_amount_for_percentage) }}</td>
+                                                        <td class="fw-bold fs-6">
+                                                            {% if remaining_amount_for_percentage < 0 %}
+                                                                <span class="text-success">+{{ "{:,.0f}".format(-remaining_amount_for_percentage) }}</span>
+                                                            {% else %}
+                                                                <span class="text-danger">{{ "{:,.0f}".format(remaining_amount_for_percentage) }}</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td class="fw-bold fs-6">
+                                                            {% if remaining_amount_for_percentage <= 0 %}
+                                                                <span class="text-success">0</span>
+                                                            {% else %}
+                                                                <span class="text-black">{{ "{:,.0f}".format(daily_target_for_percentage) }}</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مبيعات الأونلاين -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-globe me-2"></i> مبيعات الأونلاين</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- نموذج تعديل المبيعات الإضافية -->
+                    <form id="editAdditionalSalesForm" method="post" action="{{ url_for('update_additional_sales', id=target.id) }}">
+                        <div class="row align-items-end">
+                            <!-- مبيعات الأونلاين -->
+                            <div class="col-md-4 mb-3">
+                                <label for="online_sales" class="form-label fw-bold" style="font-size: 16px; color: #0d6efd;">مبيعات الأونلاين مع الخدمات</label>
+                                <div class="input-group">
+                                    <input type="text" id="online_sales" name="online_sales" class="form-control" value="{{ '{:,.0f}'.format(target.online_sales) }}" style="font-size: 18px; color: #000000; font-weight: bold; text-align: center;">
+                                    <span class="input-group-text">ريال</span>
+                                </div>
+                            </div>
+
+                            <!-- مبيعات التدريب الشخصي -->
+                            <div class="col-md-4 mb-3">
+                                <label for="personal_training_sales" class="form-label fw-bold" style="font-size: 16px; color: #0d6efd;">مبيعات التدريب الشخصي مع باقي الخدمات</label>
+                                <div class="input-group">
+                                    <input type="text" id="personal_training_sales" name="personal_training_sales" class="form-control" value="{{ '{:,.0f}'.format(target.personal_training_sales) }}" style="font-size: 18px; color: #000000; font-weight: bold; text-align: center;">
+                                    <span class="input-group-text">ريال</span>
+                                </div>
+                            </div>
+
+                            <!-- زر الحفظ -->
+                            <div class="col-md-4 mb-3 d-flex justify-content-center">
+                                <button type="submit" class="btn btn-success px-4 py-2">
+                                    <i class="fas fa-save me-2"></i> حفظ
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول المبيعات اليومية -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-primary"><i class="fas fa-list me-2"></i> سجل المبيعات اليومية <span class="badge bg-primary rounded-pill ms-2">{{ daily_sales|length }}</span></h4>
+            <a href="{{ url_for('new_daily_sales', club_id=target.club_id) }}" class="btn btn-success">
+                <i class="fas fa-plus-circle me-1"></i> إضافة مبيعات يومية
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if daily_sales %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">#</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">التاريخ</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">المبلغ</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in daily_sales %}
+                        <tr>
+                            <td class="text-center" style="font-weight: bold; ">{{ loop.index }}</td>
+                            <td class="text-center" style="font-weight: bold; ">{{ sale.sale_date.strftime('%Y-%m-%d') }}</td>
+                            <td class="text-center" style="font-weight: bold; ">{{ "{:,.0f}".format(sale.amount) }} ريال</td>
+                            <td class="text-center" >
+                                <div class="btn-group">
+                                    <a href="{{ url_for('edit_daily_sales', id=sale.id) }}" class="btn btn-sm btn-warning" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('delete_daily_sales', id=sale.id) }}" class="btn btn-sm btn-danger" title="حذف" onclick="return confirm('هل أنت متأكد من حذف هذه المبيعات؟')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-day fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد مبيعات يومية مسجلة</h5>
+                <p class="text-muted">قم بإضافة مبيعات يومية للبدء</p>
+                <a href="{{ url_for('new_daily_sales', club_id=target.club_id) }}" class="btn btn-success mt-2">
+                    <i class="fas fa-plus-circle me-1"></i> إضافة مبيعات يومية
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // تنسيق الأرقام بفواصل للآلاف - دالة مشتركة
+        function formatNumberWithCommas(input) {
+            // إزالة الأحرف غير الرقمية باستثناء الفواصل
+            var value = input.val().replace(/[^\d,]/g, '');
+
+            // إزالة جميع الفواصل
+            value = value.replace(/,/g, '');
+
+            // تنسيق الرقم بفواصل للآلاف
+            if (value) {
+                value = parseInt(value).toLocaleString('en-US');
+            }
+
+            // تحديث قيمة الحقل
+            input.val(value);
+        }
+
+        // تطبيق تنسيق الأرقام على حقل مبيعات الأونلاين
+        $('#online_sales').on('input', function() {
+            formatNumberWithCommas($(this));
+        });
+
+        // تطبيق تنسيق الأرقام على حقل مبيعات التدريب الشخصي
+        $('#personal_training_sales').on('input', function() {
+            formatNumberWithCommas($(this));
+        });
+    });
+</script>
+{% endblock %}

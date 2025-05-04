@@ -1,0 +1,153 @@
+/**
+ * تنسيق التقويم المخصص كبير الحجم
+ */
+
+/* إخفاء أيقونة التقويم الافتراضية */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+/* تنسيق حقل التاريخ */
+input[type="date"] {
+    font-family: 'Cairo', 'Segoe UI', Arial, sans-serif !important;
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+    direction: ltr !important;
+    height: 50px !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px !important;
+    border: 1px solid #ced4da !important;
+    background-color: #fff !important;
+    cursor: pointer !important;
+    position: relative !important;
+}
+
+/* تنسيق حاوية التقويم المخصص */
+.big-calendar-container {
+    font-family: 'Cairo', 'Segoe UI', Arial, sans-serif !important;
+    width: 400px !important;
+    background-color: #fff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    padding: 15px !important;
+    direction: rtl !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+}
+
+/* تنسيق رأس التقويم */
+.big-calendar-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 15px !important;
+}
+
+/* تنسيق أزرار التنقل */
+.big-calendar-header button {
+    background: transparent !important;
+    border: none !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    color: #0d6efd !important;
+}
+
+/* تنسيق عنوان الشهر والسنة */
+.big-calendar-header h3 {
+    margin: 0 !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+}
+
+/* تنسيق جدول التقويم */
+.big-calendar-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    text-align: center !important;
+}
+
+/* تنسيق رأس الجدول (أيام الأسبوع) */
+.big-calendar-table th {
+    padding: 10px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #0d6efd !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* تنسيق خلايا الجدول (أيام الشهر) */
+.big-calendar-table td {
+    padding: 10px !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    transition: background-color 0.2s !important;
+}
+
+/* تنسيق أيام الشهر السابق والتالي */
+.big-calendar-table td.other-month {
+    color: #aaa !important;
+}
+
+/* تنسيق اليوم المحدد */
+.big-calendar-table td.selected {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+/* تنسيق اليوم الحالي */
+.big-calendar-table td.today {
+    background-color: #e9ecef !important;
+    font-weight: bold !important;
+}
+
+/* تنسيق تأثير التحويم */
+.big-calendar-table td:hover:not(.selected) {
+    background-color: #f8f9fa !important;
+}
+
+/* تنسيق تذييل التقويم */
+.big-calendar-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-top: 15px !important;
+}
+
+/* تنسيق أزرار التذييل */
+.big-calendar-footer button {
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    transition: background-color 0.2s !important;
+}
+
+/* تنسيق زر اليوم */
+.big-calendar-footer button:first-child {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+}
+
+/* تنسيق زر المسح */
+.big-calendar-footer button:last-child {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+/* تنسيق تأثير التحويم على الأزرار */
+.big-calendar-footer button:hover {
+    opacity: 0.9 !important;
+}

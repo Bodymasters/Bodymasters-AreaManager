@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>تفاصيل النادي</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('clubs') }}">الأندية</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ club.name }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{{ url_for('club_schedules', club_id=club.id) }}" class="btn btn-info">
+            <i class="fas fa-calendar-alt"></i> جداول الدوام
+        </a>
+        {% if current_user.has_permission('edit_club') %}
+        <a href="{{ url_for('edit_club', id=club.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> تعديل
+        </a>
+        {% endif %}
+        {% if current_user.has_permission('delete_club') %}
+        <a href="{{ url_for('delete_club', id=club.id) }}" class="btn btn-danger" onclick="return confirm('هل أنت متأكد من حذف النادي \'{{ club.name }}\' ؟'){% if club.employees %} && alert('لا يمكن حذف النادي لأنه يحتوي على موظفين') && false{% endif %}">
+            <i class="fas fa-trash"></i> حذف
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> معلومات النادي</h5>
+                <span class="badge bg-light text-primary">رقم {{ club.id }}</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-4 text-center">
+                    <div class="display-1 text-primary mb-3">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="text-primary">{{ club.name }}</h3>
+                </div>
+
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-user-tie text-info me-2"></i>
+                            <strong>مدير النادي:</strong>
+                        </div>
+                        <span>{{ club.manager_name or 'غير محدد' }}</span>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-phone text-success me-2"></i>
+                            <strong>رقم الهاتف:</strong>
+                        </div>
+                        {% if club.phone %}
+                        <a href="tel:{{ club.phone }}" class="text-decoration-none">{{ club.phone }}</a>
+                        {% else %}
+                        <span>غير محدد</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- المرافق المرتبطة بالنادي -->
+        <div class="card h-100">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-swimming-pool me-2"></i> مرافق النادي</h5>
+                <div>
+                    <a href="{{ url_for('club_facilities', club_id=club.id) }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-cog me-1"></i> إدارة المرافق
+                    </a>
+                    <span class="badge bg-light text-success ms-2">{{ club.facilities|length }} مرفق</span>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if club.facilities %}
+                <div class="row">
+                    {% for facility in club.facilities %}
+                    <div class="col-md-6 mb-2">
+                        <div class="d-flex align-items-center p-2 border rounded {% if facility.is_active %}border-success{% else %}border-danger{% endif %}">
+                            <div class="me-2">
+                                <i class="fas fa-check-circle {% if facility.is_active %}text-success{% else %}text-danger{% endif %}"></i>
+                            </div>
+                            <div>
+                                <a href="{{ url_for('facility_detail', id=facility.id) }}" class="text-decoration-none fw-bold">
+                                    {{ facility.name }}
+                                </a>
+                                {% if not facility.is_active %}
+                                <span class="badge bg-danger ms-1">معطل</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3">
+                    <div class="text-muted mb-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <p>لم يتم تحديد أي مرافق لهذا النادي</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <!-- بطاقة الموظفين -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i> الموظفين</h5>
+                <span class="badge bg-light text-info">{{ club.employees|length }} موظف</span>
+            </div>
+            <div class="card-body">
+                {% if club.employees %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-light">
+                            <tr class="text-center">
+                                <th width="20%" class="text-center">الاسم</th>
+                                <th width="10%" class="text-center">المنصب</th>
+                                <th width="10%" class="text-center">ساعات العمل</th>
+                                <th width="10%" class="text-center">الدوام 1</th>
+                                <th width="10%" class="text-center">الدوام 2</th>
+                                <th width="15%" class="text-center">أيام الإجازة</th>
+                                <th width="15%" class="text-center">معلومات الاتصال</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for employee in club.employees %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-2">
+                                            {{ employee.name[0]|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ employee.name }}</div>
+                                            <small class="text-muted">ID: {{ employee.id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">{{ employee.position }}</span>
+                                    {% if employee.role %}
+                                    <div class="small text-muted mt-1">{{ employee.role }}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if employee.schedule %}
+                                        {{ employee.schedule.work_hours }} ساعات
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if employee.schedule and employee.schedule.shift1_start %}
+                                        {{ employee.schedule.shift1_start }} - {{ employee.schedule.shift1_end }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if employee.schedule and employee.schedule.shift2_start %}
+                                        {{ employee.schedule.shift2_start }} - {{ employee.schedule.shift2_end }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if employee.schedule and employee.schedule.off_days %}
+                                        {{ employee.schedule.off_days|replace(',', ' - ') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if employee.phone %}
+                                    <div><i class="fas fa-phone text-success me-1"></i> {{ employee.phone }}</div>
+                                    {% endif %}
+                                    {% if employee.email %}
+                                    <div><i class="fas fa-envelope text-primary me-1"></i> {{ employee.email }}</div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="display-1 text-muted mb-3">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <h5>لا يوجد موظفين في هذا النادي</h5>
+                    <p class="text-muted">يمكنك إضافة موظفين من صفحة الموظفين</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+</style>
+
+
+{% endblock %}

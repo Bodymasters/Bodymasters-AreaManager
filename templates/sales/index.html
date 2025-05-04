@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-chart-line me-2"></i> سجل المبيعات</h2>
+        <div>
+            <a href="{{ url_for('new_sales_target') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> تسجيل تارجيت شهري
+            </a>
+            <a href="{{ url_for('new_daily_sales') }}" class="btn btn-success ms-2">
+                <i class="fas fa-plus-circle me-1"></i> إضافة مبيعات يومية
+            </a>
+        </div>
+    </div>
+
+    <!-- بحث وتصفية -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" action="{{ url_for('sales_list') }}">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">بحث</label>
+                        <input type="text" class="form-control" id="search" name="search" placeholder="اسم النادي..." value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="month" class="form-label">الشهر</label>
+                        <select class="form-select" id="month" name="month">
+                            {% for month in months %}
+                                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>{{ formatted_months[month] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100 py-2 fs-5">تطبيق</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- جدول المبيعات -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-list me-2"></i> قائمة المبيعات <span class="badge bg-primary rounded-pill ms-2">{{ targets|length }}</span></h4>
+        </div>
+        <div class="card-body p-0">
+            {% if targets %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">#</th>
+                            <th style="font-size: 18px; color: #ffffff; background-color: #0d6efd; font-weight: bold;">اسم النادي</th>
+                            <th style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">الشهر</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd; font-weight: bold;">التارجيت</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">المبيعات المحققة</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">نسبة الإنجاز</th>
+                            <th class="text-center" style="font-size: 18px; color: #ffffff; background-color: #0d6efd;font-weight: bold;">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for target in targets %}
+                        <tr>
+                            <td class="text-center">{{ loop.index }}</td>
+                            <td>{{ target.club.name }}</td>
+                            <td>{{ formatted_months[target.month] }}</td>
+                            <td class="text-center">{{ "{:,.0f}".format(target.target_amount) }} ريال</td>
+                            <td class="text-center">{{ "{:,.0f}".format(target.get_achieved_amount()) }} ريال</td>
+                            <td class="text-center">
+                                <div class="progress" style="height: 25px; position: relative;">
+                                    <div class="progress-bar {% if target.get_achievement_percentage() < 50 %}bg-danger{% elif target.get_achievement_percentage() < 80 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ target.get_achievement_percentage() }}%; min-width: 2em;" aria-valuenow="{{ target.get_achievement_percentage() }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">
+                                        <span style="color: #000000; font-weight: bold; font-size: 16px; z-index: 10;">{{ target.get_achievement_percentage() }}%</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a href="{{ url_for('sales_target_detail', id=target.id) }}" class="btn btn-sm btn-info" title="عرض">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('edit_sales_target', id=target.id) }}" class="btn btn-sm btn-warning" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{{ url_for('delete_sales_target', id=target.id) }}" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا التارجيت؟ سيتم حذف جميع المبيعات اليومية المرتبطة به.');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد بيانات مبيعات للعرض</h5>
+                <p class="text-muted">قم بإضافة تارجيت جديد للبدء</p>
+                <a href="{{ url_for('new_sales_target') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle me-1"></i> تسجيل تارجيت شهري
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // تغيير الشهر يؤدي إلى إرسال النموذج تلقائياً
+        $('#month').change(function() {
+            $(this).closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

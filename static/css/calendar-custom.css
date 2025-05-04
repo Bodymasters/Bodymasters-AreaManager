@@ -1,0 +1,85 @@
+/* تنسيق مخصص لتكبير التقويم */
+
+/* تكبير حجم التقويم بالكامل */
+::-webkit-calendar-picker {
+    font-size: 18px !important;
+    scale: 1.5;
+    transform-origin: top right;
+}
+
+/* تكبير حجم الخط في أيام الأسبوع */
+::-webkit-calendar-picker-weekday-row {
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+/* تكبير حجم الخط في أيام الشهر */
+::-webkit-calendar-picker-day-cell {
+    font-size: 18px !important;
+}
+
+/* تكبير حجم الخط في عنوان الشهر والسنة */
+::-webkit-calendar-picker-title {
+    font-size: 20px !important;
+    font-weight: bold !important;
+}
+
+/* تكبير حجم أزرار التنقل */
+::-webkit-calendar-picker-navigation-button {
+    font-size: 24px !important;
+}
+
+/* تكبير حجم الخط في أزرار اليوم والشهر */
+::-webkit-calendar-picker-footer-button {
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+/* تنسيق عام للتقويم */
+::-webkit-datetime-edit {
+    font-size: 20px !important;
+}
+
+/* تكبير حجم التقويم باستخدام CSS العام */
+.calendar-container {
+    transform: scale(1.5);
+    transform-origin: top right;
+}
+
+/* تنسيق مخصص للتقويم باستخدام JavaScript */
+.calendar-large {
+    transform: scale(1.5);
+    transform-origin: top right;
+}
+
+/* تكبير حجم الخط في التقويم */
+.calendar-day {
+    font-size: 18px !important;
+}
+
+.calendar-weekday {
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+.calendar-month-year {
+    font-size: 20px !important;
+    font-weight: bold !important;
+}
+
+/* تنسيق للتقويم المنبثق */
+input[type="date"]::-webkit-calendar-picker-indicator:hover + ::-webkit-datetime-edit-fields-wrapper {
+    background-color: transparent;
+}
+
+/* تكبير حجم التقويم المنبثق */
+::-webkit-datetime-edit-fields-wrapper:focus {
+    font-size: 20px !important;
+}
+
+/* تنسيق عام للتقويم المنبثق */
+.date-picker-popup {
+    font-size: 18px !important;
+    transform: scale(1.5);
+    transform-origin: top right;
+}

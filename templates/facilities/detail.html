@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">تفاصيل المرفق</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('facilities') }}">المرافق</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ facility.name }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{{ url_for('facility_items', facility_id=facility.id) }}" class="btn btn-info me-2">
+            <i class="fas fa-list me-1"></i> بنود المرفق
+        </a>
+        {% if current_user.has_permission('edit_facility') %}
+        <a href="{{ url_for('edit_facility', id=facility.id) }}" class="btn btn-warning me-2">
+            <i class="fas fa-edit me-1"></i> تعديل
+        </a>
+        <button type="button" class="btn {% if facility.is_active %}btn-outline-success active{% else %}btn-outline-danger{% endif %} toggle-btn toggle-facility-btn me-2" data-facility-id="{{ facility.id }}" data-status="{% if facility.is_active %}active{% else %}inactive{% endif %}">
+            <i class="fas {% if facility.is_active %}fa-toggle-on{% else %}fa-toggle-off{% endif %} me-1"></i>
+            {% if facility.is_active %}تعطيل{% else %}تفعيل{% endif %}
+        </button>
+        {% endif %}
+        {% if current_user.has_permission('delete_facility') %}
+        <a href="{{ url_for('delete_facility', id=facility.id) }}" class="btn btn-danger" onclick="return confirm('هل أنت متأكد من حذف المرفق \'{{ facility.name }}\' ؟')">
+            <i class="fas fa-trash me-1"></i> حذف
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> معلومات المرفق</h5>
+                <span class="badge bg-light text-primary">رقم {{ facility.id }}</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-4 text-center">
+                    <div class="display-1 text-primary mb-3">
+                        <i class="fas fa-swimming-pool"></i>
+                    </div>
+                    <h3 class="text-primary">{{ facility.name }}</h3>
+                    <div class="mt-3">
+                        <span class="badge {% if facility.is_active %}bg-success{% else %}bg-danger{% endif %} fs-6">
+                            {% if facility.is_active %}نشط{% else %}معطل{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('facility_items', facility_id=facility.id) }}" class="btn btn-primary w-100">
+                        <i class="fas fa-list me-2"></i> عرض بنود المرفق
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-edit me-2"></i> تعديل التارجيت - {{ target.club.name }}</h2>
+        <div>
+            <a href="{{ url_for('sales_target_detail', id=target.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-right me-1"></i> العودة إلى التفاصيل
+            </a>
+        </div>
+    </div>
+
+    <!-- نموذج تعديل التارجيت -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-edit me-2"></i> تعديل التارجيت - {{ target.month }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('edit_sales_target', id=target.id) }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">النادي</label>
+                            <input type="text" class="form-control" value="{{ target.club.name }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">الشهر</label>
+                            <input type="text" class="form-control english-input" value="{{ target.month }}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="target_amount" class="form-label">مبلغ التارجيت <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control english-number numeric-input" id="target_amount" name="target_amount" value="{{ target.target_amount }}" required>
+                                <span class="input-group-text">ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-1"></i> حفظ التعديلات
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* إزالة أسهم حقل الرقم لجميع المتصفحات */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="text"].numeric-input::-webkit-inner-spin-button,
+    input[type="text"].numeric-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"],
+    input[type="text"].numeric-input {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // إضافة معالجة لحقل المبلغ للتأكد من أنه دائمًا باللغة الإنجليزية
+        $('#target_amount').on('input', function() {
+            // التأكد من أن القيمة هي أرقام فقط
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    /* إزالة أسهم الزيادة والنقصان من حقول الأرقام */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    /* تأكيد على استخدام الأرقام الإنجليزية */
+    .english-number {
+        direction: ltr !important;
+        text-align: center !important;
+        font-family: 'Arial', sans-serif !important;
+    }
+
+    /* تنسيق حقل اختيار النادي المعطل */
+    select[readonly] {
+        pointer-events: none;
+        background-color: #f8f9fa;
+        opacity: 1;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // تعطيل حقل اختيار النادي إذا كان محددًا مسبقًا
+        var clubSelect = document.getElementById('club_id');
+        if (clubSelect.options.length === 1 && clubSelect.options[0].selected) {
+            clubSelect.setAttribute('disabled', 'disabled');
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-sun me-2"></i> إضافة سجل شموس جديد</h2>
+        <a href="{{ url_for('shumoos_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل شموس
+        </a>
+    </div>
+
+    <!-- نموذج إضافة سجل جديد -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-plus-circle me-2"></i> سجل جديد</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('new_shumoos') }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="club_id" class="form-label">النادي <span class="text-danger">*</span></label>
+                            {% if selected_club_id %}
+                            <input type="hidden" name="club_id" value="{{ selected_club_id }}">
+                            {% endif %}
+                            <select style="text-align: center; font-size: 20px; color:rgb(56, 25, 211); font-weight: bold;" class="form-select" id="club_id" {% if not selected_club_id %}name="club_id"{% endif %} required {% if selected_club_id %}readonly{% endif %}>
+                                {% if not selected_club_id %}
+                                <option value="" selected disabled>اختر النادي...</option>
+                                {% endif %}
+                                {% for club in clubs %}
+                                <option value="{{ club.id }}" {% if selected_club_id and selected_club_id == club.id %}selected{% endif %} {% if selected_club_id and selected_club_id != club.id %}disabled{% endif %}>{{ club.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="registered_count" class="form-label">العدد المسجل في النظام <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control english-number text-center" id="registered_count" name="registered_count" min="0" required style="font-size: 20px; font-weight: bold;">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="registration_date" class="form-label">تاريخ التسجيل</label>
+                            <input type="date" class="form-control english-number" id="registration_date" name="registration_date" value="{{ today }}" readonly style="font-size: 20px; font-weight: bold; text-align: center !important; direction: ltr; display: block; margin: auto;">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-1"></i> حفظ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+﻿id,name,is_active,is_imported
+1,المهام الإدارية,True,True
+2,عام,True,True
+3,"مدخل النادي 
+ومنطقة الإستقبال",True,True
+4,صالة الترفية,True,True
+5,الحصص الجماعية,True,True
+6,صالة الحديد,True,True
+7,صالة التمارين الوظيفيه,True,True
+8,صالة الكارديو,True,True
+9,صالة السياكل الهوائية,True,True
+10,القسم الصحي,True,True
+11,المسبح,True,True
+12,الملاعب,True,True
+13,المضمار,True,True
+14,غرفة غسيل المناشف,True,True
+15,صالة الفنون القتالية,False,False

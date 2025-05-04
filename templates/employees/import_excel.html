@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-1">استيراد بيانات الموظفين من إكسل</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('employees') }}">الموظفين</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">استيراد من إكسل</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ url_for('employees') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى القائمة
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-excel me-2"></i> استيراد بيانات الموظفين</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i> تعليمات الاستيراد</h5>
+                        <p>يرجى اتباع الخطوات التالية لاستيراد بيانات الموظفين:</p>
+                        <ol>
+                            <li>قم بتنزيل <a href="{{ url_for('download_employee_template') }}" class="alert-link">قالب الإكسل</a> المعد مسبقاً.</li>
+                            <li>قم بتعبئة البيانات في القالب وفقاً للأعمدة المحددة.</li>
+                            <li>تأكد من أن الأعمدة التالية موجودة وصحيحة:
+                                <ul>
+                                    <li><strong>employee_id:</strong> الرقم الوظيفي (يجب أن يكون فريداً)</li>
+                                    <li><strong>name:</strong> اسم الموظف</li>
+                                    <li><strong>position:</strong> الوظيفة</li>
+                                    <li><strong>role:</strong> الدور الوظيفي</li>
+                                    <li><strong>phone:</strong> رقم الهاتف (اختياري)</li>
+                                    <li><strong>club_id:</strong> رقم النادي (يجب أن يكون موجوداً في النظام)</li>
+                                    <li><strong>is_active:</strong> حالة الموظف (اختياري, True أو False)</li>
+
+                                </ul>
+                            </li>
+                            <li>قم بحفظ الملف بصيغة Excel (.xlsx, .xls) أو CSV (.csv).</li>
+                            <li>قم برفع الملف باستخدام النموذج أدناه.</li>
+                        </ol>
+                    </div>
+
+                    <form method="post" action="{{ url_for('import_employees_excel') }}" enctype="multipart/form-data" class="mt-4">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">اختر ملف الإكسل</label>
+                            <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls,.csv" required>
+                            <div class="form-text">الصيغ المدعومة: Excel (.xlsx, .xls) أو CSV (.csv)</div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload me-1"></i> رفع الملف واستيراد البيانات
+                            </button>
+                            <a href="{{ url_for('download_employee_template') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-download me-1"></i> تنزيل قالب الإكسل
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

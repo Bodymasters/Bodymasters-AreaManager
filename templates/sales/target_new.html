@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0"><i class="fas fa-bullseye me-2"></i> تسجيل تارجيت شهري</h2>
+        <a href="{{ url_for('sales_clubs_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى قائمة المبيعات
+        </a>
+    </div>
+
+    <!-- نموذج إضافة تارجيت -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-plus-circle me-2"></i> تارجيت جديد</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('new_sales_target') }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="club_id" class="form-label">النادي <span class="text-danger">*</span></label>
+                            <select style="text:align: center; font-size: 20px; color:rgb(56, 25, 211); font-weight: bold;" class="form-select" id="club_id" name="club_id"  required >
+                                <option value="" {% if not selected_club %}selected disabled{% endif %}>اختر النادي...</option>
+                                {% for club in clubs %}
+                                <option value="{{ club.id }}" style="text:align: center; font-size: 20px; color:rgb(56, 25, 211); font-weight: bold;" {% if selected_club and selected_club.id == club.id %}selected{% endif %}>{{ club.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="month" class="form-label">الشهر <span class="text-danger">*</span></label>
+                            <input style="text:align: center;font-size: 20px;" type="month" class="form-control english-input" id="month" name="month" value="{{ current_month }}" required >
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="target_amount" class="form-label">مبلغ التارجيت <span class="text-danger">*</span></label>
+                            <div  class="input-group" >
+                                <input style="text:align: center; font-size: 20px; font-weight: bold;" type="text" class="form-control english-number numeric-input" id="target_amount" name="target_amount" required>
+                                <span class="input-group-text">ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-1"></i> حفظ التارجيت
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* إزالة أسهم حقل الرقم لجميع المتصفحات */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="text"].numeric-input::-webkit-inner-spin-button,
+    input[type="text"].numeric-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"],
+    input[type="text"].numeric-input {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // إضافة معالجة لحقل المبلغ للتأكد من أنه دائمًا باللغة الإنجليزية
+        $('#target_amount').on('input', function() {
+            // التأكد من أن القيمة هي أرقام فقط
+            this.value = this.value.replace(/[^0-9.]/g, '');
+        });
+    });
+</script>
+{% endblock %}

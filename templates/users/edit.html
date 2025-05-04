@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="mb-3">تعديل بيانات المستخدم</h1>
+    </div>
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('users') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى القائمة
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label fw-bold fs-5">الرقم الوظيفي</label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" value="{{ user.username }}" readonly>
+                            <small class="text-danger">لا يمكن تغيير الرقم الوظيفي</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label fw-bold fs-5">الاسم</label>
+                            <input type="text" class="form-control form-control-lg" id="name" name="name" value="{{ user.name }}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="phone" class="form-label fw-bold fs-5">رقم الهاتف</label>
+                            <input type="text" class="form-control form-control-lg" id="phone" name="phone" value="{{ user.phone }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="password" class="form-label fw-bold fs-5">كلمة المرور الجديدة</label>
+                            <div class="input-group input-group-lg">
+                                <input type="password" class="form-control" id="password" name="password">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">اتركها فارغة إذا كنت لا ترغب في تغيير كلمة المرور</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="role" class="form-label fw-bold fs-5">الدور</label>
+                            <select class="form-select form-select-lg" id="role" name="role" required>
+                                <option value="user" {% if user.role == 'user' %}selected{% endif %}>مستخدم عادي</option>
+                                <option value="supervisor" {% if user.role == 'supervisor' %}selected{% endif %}>مشرف</option>
+                                <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>مدير</option>
+                                <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>مسؤول النظام</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold fs-5">النوادي</label>
+                        <div class="row">
+                            {% for club in clubs %}
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="club_{{ club.id }}" name="clubs" value="{{ club.id }}"
+                                        {% if club in user.clubs %}checked{% endif %}>
+                                    <label class="form-check-label fs-5" for="club_{{ club.id }}">
+                                        {{ club.name }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{{ url_for('user_detail', id=user.id) }}" class="btn btn-secondary btn-lg me-md-2">
+                            <i class="fas fa-times me-1"></i> إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-1"></i> حفظ التغييرات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إظهار/إخفاء كلمة المرور
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            // تبديل نوع الحقل بين password و text
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // تبديل الأيقونة بين العين والعين المغلقة
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
+{% endblock %}

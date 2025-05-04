@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">تفاصيل المخالفة</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('violations_list') }}">سجل المخالفات</a></li>
+                <li class="breadcrumb-item active" aria-current="page">تفاصيل المخالفة</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        {% if current_user.has_permission('edit_violation') %}
+        <a href="{{ url_for('edit_violation', id=violation.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit me-1"></i> تعديل المخالفة
+        </a>
+        {% endif %}
+        <a href="{{ url_for('violations_employee_detail', employee_id=violation.employee.id) }}" class="btn btn-secondary ms-2">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل مخالفات الموظف
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i> بيانات المخالفة</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-2">بيانات الموظف</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="bg-light" width="40%">الرقم الوظيفي</th>
+                                <td class="english-number">{{ violation.employee.employee_id }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">اسم الموظف</th>
+                                <td>{{ violation.employee.name }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">الدور الوظيفي</th>
+                                <td>{{ violation.employee.role }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">النادي</th>
+                                <td>{{ violation.employee.club.name }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-muted mb-2">بيانات المخالفة</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="bg-light" width="40%">رقم المخالفة</th>
+                                <td class="english-number">{{ violation.violation_number }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">رقم المخالفة من نفس النوع</th>
+                                <td class="english-number">{{ same_type_number }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">نوع المخالفة</th>
+                                <td>{{ violation.violation_type.name }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">مصدر المخالفة</th>
+                                <td>{{ violation.violation_source }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">تاريخ المخالفة</th>
+                                <td class="english-number">{{ violation.violation_date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">تم التوقيع</th>
+                                <td>
+                                    {% if violation.is_signed %}
+                                    <span class="badge bg-success">نعم</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">لا</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                {% if violation.notes %}
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <h5 class="text-muted mb-2">ملاحظات</h5>
+                        <div class="p-3 bg-light rounded">
+                            {{ violation.notes }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="text-muted mb-2">معلومات إضافية</h5>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="bg-light" width="30%">تاريخ التسجيل</th>
+                                <td class="english-number">{{ violation.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">تم التسجيل بواسطة</th>
+                                <td>{{ violation.user.name }}</td>
+                            </tr>
+                            {% if violation.updated_at and violation.updated_at != violation.created_at %}
+                            <tr>
+                                <th class="bg-light">تاريخ آخر تحديث</th>
+                                <td class="english-number">{{ violation.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        {% if violation.image_path %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-image me-2"></i> صورة المخالفة</h4>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='uploads/' + violation.image_path) }}" class="img-fluid rounded" alt="صورة المخالفة">
+                <a href="{{ url_for('static', filename='uploads/' + violation.image_path) }}" class="btn btn-primary mt-3" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i> عرض الصورة بالحجم الكامل
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if violation.violation_type.description %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i> وصف المخالفة</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ violation.violation_type.description }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

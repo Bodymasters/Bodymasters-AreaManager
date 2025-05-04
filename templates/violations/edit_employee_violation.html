@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- إضافة تنسيق التقويم المخصص كبير الحجم -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/big-calendar.css') }}">
+<style>
+    /* تكبير حجم الخط في جميع الحقول */
+    .form-control, .form-select, .input-group-text, .form-label {
+        font-size: 18px !important;
+    }
+
+    /* تكبير حجم الخط في القوائم المنسدلة */
+    select.form-select option {
+        font-size: 18px !important;
+    }
+
+    /* تكبير حجم الخط في مناطق النص */
+    textarea.form-control {
+        font-size: 18px !important;
+    }
+
+    /* تكبير حجم الخط في العلامات والنصوص الصغيرة */
+    .form-check-label, small {
+        font-size: 16px !important;
+    }
+
+    /* تكبير حجم الخط في الأزرار */
+    .btn {
+        font-size: 18px !important;
+    }
+
+    /* زيادة ارتفاع الحقول لتناسب حجم الخط الأكبر */
+    .form-control, .form-select {
+        height: 45px;
+    }
+    
+    /* تنسيق اسم الموظف في الأعلى */
+    .employee-name-header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">تعديل مخالفة</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('violations_list') }}">سجل المخالفات</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('violations_club_detail', club_id=violation.employee.club_id) }}">{{ violation.employee.club.name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('violations_employee_detail', employee_id=violation.employee.id) }}">{{ violation.employee.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">تعديل مخالفة</li>
+            </ol>
+        </nav>
+    </div>
+    <div>
+        <a href="{{ url_for('violation_detail', id=violation.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى تفاصيل المخالفة
+        </a>
+    </div>
+</div>
+
+<!-- عرض اسم الموظف في الأعلى -->
+<div class="employee-name-header">
+    <i class="fas fa-user-circle me-2"></i> تعديل مخالفة للموظف: {{ violation.employee.name }}
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i> بيانات المخالفة</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('edit_violation_from_employee', id=violation.id) }}" method="post" enctype="multipart/form-data" id="violation-form">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="violation_type_id" class="form-label">نوع المخالفة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-exclamation-triangle"></i></span>
+                                <select class="form-select" id="violation_type_id" name="violation_type_id" required>
+                                    <option value="" disabled>-- اختر نوع المخالفة --</option>
+                                    {% for type in violation_types %}
+                                    <option value="{{ type.id }}" {% if type.id == violation.violation_type_id %}selected{% endif %}>{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="violation_source" class="form-label">مصدر المخالفة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                <select class="form-select" id="violation_source" name="violation_source" required>
+                                    <option value="" disabled>-- اختر مصدر المخالفة --</option>
+                                    {% for source in violation_sources %}
+                                    <option value="{{ source }}" {% if source == violation.violation_source %}selected{% endif %}>{{ source }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="violation_date" class="form-label">تاريخ المخالفة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control english-input" id="violation_date" name="violation_date" required value="{{ violation.violation_date.strftime('%Y-%m-%d') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="is_signed" class="form-label d-block">تم التوقيع</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_signed" name="is_signed" style="width: 3em; height: 1.5em;" {% if violation.is_signed %}checked{% endif %}>
+                                <label class="form-check-label" for="is_signed">نعم، تم التوقيع على المخالفة</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label for="image" class="form-label">صورة المخالفة</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            </div>
+                            <small class="text-muted">يمكنك تحميل صورة جديدة للمخالفة (اختياري)</small>
+                            {% if violation.image_path %}
+                            <div class="mt-2">
+                                <a href="{{ url_for('static', filename='uploads/' + violation.image_path) }}" target="_blank" class="btn btn-sm btn-info">
+                                    <i class="fas fa-image me-1"></i> عرض الصورة الحالية
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="notes" class="form-label">ملاحظات</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-sticky-note"></i></span>
+                                <textarea class="form-control" id="notes" name="notes" rows="3">{{ violation.notes }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-save me-1"></i> حفظ التعديلات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- إضافة سكريبت التقويم المخصص كبير الحجم -->
+<script src="{{ url_for('static', filename='js/big-calendar.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // تعيين لغة حقول التاريخ للإنجليزية
+        const violationDateInput = document.getElementById('violation_date');
+
+        // تعيين اللغة والسمات الإضافية
+        if (violationDateInput) {
+            violationDateInput.lang = 'en';
+
+            // إضافة سمات إضافية للتأكد من عرض التاريخ باللغة الإنجليزية
+            violationDateInput.setAttribute('data-date', '');
+
+            // إضافة مستمع الحدث للنقر لفتح منتقي التاريخ
+            violationDateInput.addEventListener('click', function() {
+                this.showPicker();
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+<!-- بطاقات الإجراءات -->
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0 text-center">الإجراءات</h5>
+    </div>
+    <div class="card-body p-2">
+        <div class="action-card">
+            <div class="row g-0">
+                <div class="col-6">
+                    <a href="{{ url_for('violations_clubs_list') }}" class="action-button view-button">
+                        <i class="fas fa-eye"></i>
+                        <span class="action-button-text">عرض المخالفات</span>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="{{ url_for('new_violation') }}" class="action-button add-button">
+                        <i class="fas fa-plus-circle"></i>
+                        <span class="action-button-text">تسجيل مخالفة</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

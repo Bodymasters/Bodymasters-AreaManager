@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4 text-start">
+        <a href="{{ url_for('camera_checks_list') }}" class="btn btn-secondary me-2">
+            <i class="fas fa-arrow-right me-1"></i> العودة إلى سجل المتابعة
+        </a>
+        <form action="{{ url_for('delete_camera_check', id=camera_check.id) }}" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف متابعة الكاميرات رقم {{ camera_check.id }} لنادي {{ camera_check.club.name }}؟');">
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash me-1"></i> حذف
+            </button>
+        </form>
+    </div>
+    <div class="col-md-8">
+        <h1 class="mb-3">تفاصيل متابعة الكاميرات</h1>
+        <p class="text-muted">تاريخ المتابعة: {{ camera_check.check_date.strftime('%Y-%m-%d') }}</p>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <i class="fas fa-info-circle me-1"></i> معلومات المتابعة
+            </div>
+            <div class="card-body py-2">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <span><strong>رقم المتابعة:</strong> {{ camera_check.id }}</span>
+                    </div>
+                    <div class="col-md-3">
+                        <span><strong>تاريخ المتابعة:</strong> {{ camera_check.check_date.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    <div class="col-md-3">
+                        <span><strong>النادي:</strong> {{ camera_check.club.name }}</span>
+                    </div>
+                    <div class="col-md-3">
+                        <span><strong>المستخدم:</strong> {{ camera_check.user.username }}</span>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <span><strong>عدد المخالفات:</strong> {{ camera_check.violations_count }}</span>
+                    </div>
+                </div>
+                {% if camera_check.notes %}
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <span><strong>ملاحظات:</strong> {{ camera_check.notes }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <i class="fas fa-video me-1"></i> فترات المتابعة
+            </div>
+            <div class="card-body py-2">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <!-- تم تعطيل عمود افتتاح النادي لحل مشكلة قاعدة البيانات -->
+                                <!-- <th class="text-center">افتتاح النادي</th> -->
+                                {% for slot in time_slots %}
+                                <th class="text-center">{{ slot.time_slot }}</th>
+                                {% endfor %}
+                                <th class="text-center">عدد المخالفات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <!-- تم تعطيل خلية افتتاح النادي لحل مشكلة قاعدة البيانات -->
+                                <!--
+                                <td class="text-center">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" style="width: 1.5em; height: 1.5em;" type="checkbox" {% if camera_check.club_open %}checked{% endif %} disabled>
+                                    </div>
+                                </td>
+                                -->
+                                {% for slot in time_slots %}
+                                <td class="text-center">
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" style="width: 1.5em; height: 1.5em;" type="checkbox" {% if slot['is_working'] == 1 %}checked{% endif %} disabled>
+                                    </div>
+                                </td>
+                                {% endfor %}
+                                <td class="text-center align-middle">{{ camera_check.violations_count }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

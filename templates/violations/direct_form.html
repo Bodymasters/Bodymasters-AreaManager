@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">جاري التوجيه...</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p>جاري توجيهك إلى صفحة تسجيل مخالفة جديدة للموظف: <strong>{{ employee.name }}</strong></p>
+                    <div class="spinner-border text-primary my-3" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="text-muted">إذا لم يتم توجيهك تلقائياً، يرجى النقر على الزر أدناه</p>
+                    <button id="submit-form" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-1"></i> الانتقال إلى صفحة تسجيل المخالفة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نموذج مخفي لإرسال البيانات -->
+<form id="auto-submit-form" action="{{ url_for('new_violation') }}" method="post" style="display: none;">
+    <input type="hidden" name="employee_id" value="{{ employee.employee_id }}">
+    <input type="hidden" name="employee_id_hidden" value="{{ employee.employee_id }}">
+    <input type="hidden" name="employee_name_hidden" value="{{ employee.name }}">
+    <input type="hidden" name="employee_role_hidden" value="{{ employee.role }}">
+    <input type="hidden" name="club_name_hidden" value="{{ employee.club.name }}">
+    <input type="hidden" name="violation_number_hidden" value="{{ violations_count + 1 }}">
+    <input type="hidden" name="from_direct_form" value="1">
+    <input type="submit" id="submit-button">
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // إرسال النموذج تلقائياً عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("تم تحميل الصفحة، جاري إرسال النموذج...");
+
+        // إرسال النموذج فوراً
+        document.getElementById('submit-button').click();
+
+        // إضافة مستمع حدث للزر
+        document.getElementById('submit-form').addEventListener('click', function() {
+            console.log("تم النقر على الزر، جاري إرسال النموذج...");
+            document.getElementById('submit-button').click();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+/* إزالة جميع الهوامش والحشوات الافتراضية */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
+/* تثبيت شريط التنقل في الأعلى بحيث لا يتحرك عند التمرير */
+.navbar.fixed-top {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 45px !important;
+    z-index: 9999 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* تعديل المحتوى الرئيسي */
+main.container-fluid {
+    margin-top: 60px !important;
+    padding-top: 15px !important;
+}
+
+/* إضافة مسافة للعناصر في أعلى الصفحة */
+.card, .btn-toolbar, .action-buttons, form {
+    margin-top: 10px !important;
+}
+
+/* تعديل روابط شريط التنقل وتكبير حجم الخط */
+.navbar-nav .nav-link {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+}
+
+/* إزالة أي هوامش من حاوية شريط التنقل */
+.container-fluid {
+    padding: 0 !important;
+}
+
+/* تعديل زر التوجل في الشاشات الصغيرة */
+.navbar-toggler {
+    padding: 2px 5px !important;
+    margin: 4px !important;
+}
